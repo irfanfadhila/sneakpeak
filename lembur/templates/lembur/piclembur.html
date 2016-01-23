@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Daftar Lembur yang Menunggu Verifikasi</b></h6>
+
+        <ul class="accordion" data-accordion>
+            {% for au in arrunit %}
+                <li class="accordion-navigation">
+                    <a href="#lembur-{{ au.id }}">Unit Kerja {{ au.unit }} <span id="span-{{ au.id }}" class="alert round label" style="float: right;">{{ au.count }}</span></a>
+                    <div id="lembur-{{ au.id }}" class="content">
+                        <table id="tb-lembur-{{ au.id }}" class="display table-data lembur-verifikasi" style="table-layout: fixed">
+                        <thead>
+                            <tr>
+                                <th style="width:5%;">ID</th>
+                                <th>Deskripsi Pekerjaan</th>
+                                <th>Hari, Tanggal</th>
+                                <th>Jenis Lembur</th>
+                                <th>Waktu Kerja</th>
+                                <th>Pegawai</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                            </tr>
+                        </thead>
+                        <tfoot style="display: table-header-group">
+                            <tr>
+                                <th>ID</th>
+                                <th>Deskripsi Pekerjaan</th>
+                                <th>Hari, Tanggal</th>
+                                <th>Jenis Lembur</th>
+                                <th>Waktu Kerja</th>
+                                <th>Pegawai</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        {% if lemburverifikasi.count > 0 %}
+                        {% for lv in lemburverifikasi %}
+                            {% if lv.pegawai.unit.id == au.id %}
+                            <tr id="lv-{{ lv.id }}">
+                                <td>#{{ lv.id }}</td>
+                                <td><a class="data-lembur" data-reveal-id="lihat-lembur" data-id-lembur="{{ lv.id }}">{{ lv.deskripsi_pekerjaan }}</a></td>
+                                <td>{{ lv.tanggal }}</td>
+                                <td>{{ lv.jenis_lembur.jenis_lembur }}</td>
+                                <td>{{ lv.waktu_mulai|time:'H:i' }} - {{ lv.waktu_selesai|time:'H:i' }}</td>
+                                <td>{{ lv.pegawai.user.first_name }}</td>
+                                <td>{{ lv.status.status }}</td>
+                                <td>{{ lv.created_by.user.first_name }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        {% else %}
+                            <p>Tidak ada lembur yang menunggu verifikasi dari unit ini.</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+</div>
+
+<!--Pop Up lihat lembur-->
+<div id="lihat-lembur" class="reveal-modal medium" data-reveal>
+    <form id="form-setujui-lembur" class="forml">
+        {% csrf_token %}
+        <input name="lembur" type="hidden">
+        <fieldset>
+            <legend>Detail Pengajuan Lembur</legend>
+            <a class="ubah button round tiny" style="float: right; margin-left: 2%;">Ubah Data Lembur</a>
+            <a class="cek button round tiny" style="float: right;">Cek Absen</a>
+            <div id="flash" style="float: right; display: inline;"></div>
+            <table id="table-lihat" style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Nama</label>
+                        <input name="namapegawai" type="text" readonly>
+                        <input name="pegawai" type="hidden">
+                    </td>
+                    <td>
+                        <label>Deskripsi Pekerjaan</label>
+                        <textarea name="deskripsi" rows="5" required readonly></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div>
+                            <label>Hari, Tanggal</label>
+                            <input name="tanggal" type="date" required readonly>
+                            <input name="jenis" type="checkbox" disabled> Akhir Pekan / Hari Libur
+                        </div>
+                        <div>
+                            <label>Waktu Kerja Lembur</label>
+                            <div style="width:45%; float: left;">
+                                Terjadwal: <br>
+                                Mulai <input name="mulai" type="time" required readonly>
+                                Selesai <input name="selesai" type="time" required readonly>
+                            </div>
+                            <div style="width:45%; float: right;">
+                                Realisasi: <br>
+                                Mulai <input class="realisasi" name="masuk" type="time" required readonly>
+                                Selesai <input class="realisasi" name="keluar" type="time" required readonly>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <label>Komponen Honor Lembur</label>
+                        Bantuan: <input name="bantuan" type="text" required readonly>
+                        Makan: <input name="makan" type="text" required readonly>
+                        Transport: <input name="transport" type="text" required readonly>
+                        Total: <input name="total" type="text" required readonly>
+                    </td>
+                </tr>
+            </table>
+            <button class="button radius tiny setujui" data-reveal-id="konfirmasi" style="float: right; margin-left: 2px;">Verifikasi</button>
+            <input name="ajukan" type="hidden">
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p></p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var verifikasilemburit = $('.lembur-verifikasi').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        verifikasilemburit.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // initial state modal lihat lembur
+    $('#lihat-lembur').data('initial-state', $('#lihat-lembur').html());
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        $('#form-setujui-lembur').submit();
+    });
+
+    // button setujui
+    $(document).on('click', '.setujui', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=ajukan]').val('verifikasi');
+        $('#konfirmasi fieldset p').html("<h5>Apakah anda yakin ingin data lembur ini telah terverifikasi?</h5>"+
+        "<br> Bila ya, maka lembur ini bisa di proses untuk pembuatan laporan pembayaran.");
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // open lihat lembur
+    $(document).on('click', 'tbody tr td .data-lembur', function(){
+        var id = $(this).data('idLembur');
+        $.ajax({
+            type: 'POST',
+            url: '../../lihatlembur/',
+            data: {lembur: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#lihat-lembur').html($('#lihat-lembur').data('initial-state'));
+                $(document).foundation('reveal', 'reflow');
+                $('#lihat-lembur input[name=lembur]').val(response.lembur);
+                $('#lihat-lembur input[name=namapegawai]').val(response.namapegawai);
+                $('#lihat-lembur input[name=pegawai]').val(response.pegawai);
+                $('#lihat-lembur textarea[name=deskripsi]').val(response.deskripsi);
+                $('#lihat-lembur input[name=tanggal]').val(response.tanggal);
+                $('#lihat-lembur input[name=mulai]').val(response.mulai);
+                $('#lihat-lembur input[name=selesai]').val(response.selesai);
+                $('#lihat-lembur input[name=jenis]').prop('checked', response.jenis);
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // submit form setujui lembur
+    $(document).on("submit", "#form-setujui-lembur", function(e){
+        e.preventDefault();
+        var form = $('#form-setujui-lembur').serializeArray();
+        var deskripsi = $('form-setujui-lembur input[name=deskripsi]').val();
+        $(".flash").show();
+        $(".flash").fadeIn(400).html('<p>Pengajuan lembur sedang diproses ...</p>');
+        $.ajax({
+            type: "POST",
+            url: "../../ubahlembur/",
+            data: form,
+            dataType: "json",
+            success: function (response) {
+                $('#flash').hide();
+                alert("Data berhasil disimpan");
+                $('.reveal-modal').foundation('reveal', 'close');
+                $('#lihat-lembur').html($('#lihat-lembur').data('initial-state'));
+                $(document).foundation('reveal', 'reflow');
+                $('#tb-lembur-' + response.unitid + ' #lv-' + response.lembur).remove();
+                var currentspan = $('#span-' + response.unitid).html();
+                var countspan = parseInt(currentspan) - 1
+                $('#span-' + response.unitid).html(countspan);
+                //location.reload();
+            },
+            error: function () {
+                alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                //location.reload();
+            }
+        });
+    });
+
+    // tombol ubah dan simpan
+    $(document).on("click", ".ubah", function(){
+        $(this).closest("fieldset").find("#table-lihat input[name=masuk], #table-lihat input[name=keluar]").prop("readonly", false);
+        $(this).text("Simpan Data Lembur");
+        $(this).attr("class", "simpan button round tiny");
+    });
+    $(document).on("click", ".simpan", function(){
+        $(this).closest("fieldset").find("#table-lihat input[name=masuk], #table-lihat input[name=keluar]").prop("readonly", true);
+        $(this).text("Ubah Data Lembur");
+        $(this).attr("class", "ubah button round tiny")
+    });
+
+    // cek absen
+    $(document).on("click", ".cek", function(){
+        var username = $('#form-setujui-lembur input[name=pegawai]').val();
+        var tanggal = $('#form-setujui-lembur input[name=tanggal]').val();
+        $.ajax({
+            type: 'POST',
+            url: '../../cekabsen/',
+            data: {username: username, tanggal: tanggal, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                if (response.masuk || response.keluar) {
+                    $('#lihat-lembur input[name=masuk]').val(response.masuk);
+                    $('#lihat-lembur input[name=keluar]').val(response.keluar);
+                } else {
+                    alert("Tidak ada data absen yang terekam");
+                }
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    $(document).on('change', '.realisasi', function(){
+        var masuk = $('#form-setujui-lembur input[name=masuk]').val().split(':');
+        var jam_masuk = parseInt(masuk[0]) * 100;
+        var menit_masuk = parseInt(masuk[1]);
+        //var waktu_masuk = jam_masuk + menit_masuk;
+        var keluar = $('#form-setujui-lembur input[name=keluar]').val().split(':');
+        var jam_keluar = parseInt(keluar[0]) * 100;
+        var menit_keluar = parseInt(keluar[1]);
+        //var waktu_keluar = jam_keluar + menit_keluar;
+        var jamdikurangi = jam_keluar - jam_masuk;
+        var menitdikurangi = menit_keluar - menit_masuk;
+        var durasi = jamdikurangi + menitdikurangi;
+        if (menitdikurangi < 0) {
+            var menit = (60 - menit_keluar) + (60 - menit_masuk);
+            jamdikurangi = jamdikurangi - 100;
+            durasi = jamdikurangi + menit;
+        }
+        if (masuk && keluar){
+            var bantuan = (17000 * durasi) / 100;
+            var makan = 0;
+            if (durasi >= 200) {
+                var makan = 27000;
+            }
+            var transport = 0;
+            if ($('#form-setujui-lembur input[name=jenis]').checked){
+                transport = 38000;
+            }
+            $('#form-setujui-lembur input[name=bantuan]').val(bantuan);
+            $('#form-setujui-lembur input[name=makan]').val(makan);
+            $('#form-setujui-lembur input[name=transport]').val(transport);
+            var total = bantuan + makan + transport;
+            $('#form-setujui-lembur input[name=total]').val(total);
+        }
+        return false;
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form, .accordion .accordion-navigation a {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

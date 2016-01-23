@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <ul class="tabs" data-tab role="tablist">
+          <li class="tab-title active" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1" style="padding: 10px; border-right: 1px solid black; font-size: small;">Pengajuan Lembur</a></li>
+          <li class="tab-title" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2" style="padding: 10px ;border-right: 1px solid black; font-size: small;">Data Lembur Semua Unit Kerja</a></li>
+          <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3" style="padding: 10px; font-size: small;">Statistik Lembur</a></li>
+        </ul>
+        <div class="tabs-content">
+          <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+            <p>
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Pengajuan Baru</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Persetujuan Manajer/Wadek</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Verifikasi SDM</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Proses Pembayaran</a>
+              </p>
+            <h6><b>Daftar Pengajuan Lembur oleh Saya</b></h6>
+            <a href="#" data-reveal-id="add-pengajuan" class="button round tiny">+ Pengajuan Baru</a>
+              <table id="table-id-pengajuan" class="display table-data" style="table-layout: fixed">
+                  <thead>
+                  <tr>
+                      <th style="width:5%;">No</th>
+                      <th style="width: 30%">Judul</th>
+                      <th>Waktu Lembur</th>
+                      <th>Tanggal Pengajuan</th>
+                      <th>Status</th>
+                      <th>Keterangan</th>
+                      <th>Aksi</th>
+                  </tr>
+                  </thead>
+                  <tfoot style="display: table-header-group;">
+                  <tr>
+                      <th>No</th>
+                      <th>Judul</th>
+                      <th>Waktu Lembur</th>
+                      <th>Tanggal Pengajuan</th>
+                      <th>Status</th>
+                      <th>Keterangan</th>
+                      <th>Aksi</th>
+                  </tr>
+                  </tfoot>
+                  <tbody>
+                  <tr id="1">
+                      <td>1</td>
+                      <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Pengaturan Listrik Compfest</a></td>
+                      <td>01 - 02 Oktober 2015</td>
+                      <td>28 September 2015</td>
+                      <td>Pengajuan Baru</td>
+                      <td>-</td>
+                      <td>-</td>
+                  </tr>
+                  <tr id="2">
+                      <td>2</td>
+                      <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Piket Mingguan</a></td>
+                      <td>01 - 02 Oktober 2015</td>
+                      <td>28 September 2015</td>
+                      <td>Persetujuan Manajer/Wadek</td>
+                      <td>Belum disetujui Wadek</td>
+                      <td>[<a>Setujui</a>] [<a>Tolak</a>]</td>
+                  </tr>
+                  <tr id="3">
+                      <td>3</td>
+                      <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Seminar</a></td>
+                      <td>01 - 02 Oktober 2015</td>
+                      <td>23 September 2015</td>
+                      <td>Verifikasi SDM</td>
+                      <td>Menunggu kelengkapan dokumen</td>
+                      <td>-</td>
+                  </tr>
+                  <tr id="4">
+                      <td>4</td>
+                      <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Persiapan Awal Semester</a></td>
+                      <td>01 -02 Oktober 2015</td>
+                      <td>1 September 2015</td>
+                      <td>Proses Pembayaran</td>
+                      <td>Pembayaran sudah diajukan ke keuangan</td>
+                      <td>-</td>
+                  </tr>
+                  </tbody>
+              </table>
+          </section>
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+            <p>
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Pengajuan Baru</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Persetujuan Manajer/Wadek</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Verifikasi SDM</a>&#8212;
+                  <a class="button round tiny"><b style="color: yellow; font-size: medium">1</b> | Proses Pembayaran</a>
+              </p>
+              <h6><b>Daftar Pengajuan Lembur di Semua Unit Kerja</b></h6>
+            <p style="font-size: small;">Berikut ini adalah data semua lembur pegawai:</p>
+              <table id="table-id-ditugasi" class="display table-data" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th style="width:5%;">No</th>
+                        <th style="width: 30%">Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tfoot style="display: table-header-group;">
+                    <tr>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr id="1">
+                            <td>1</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Pengaturan Listrik Compfest</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>28 September 2015</td>
+                            <td>Persetujuan Manajer/Wadek</td>
+                            <td>Belum disetujui Wadek</td>
+                            <td>[<a>Setujui</a>] [<a>Tolak</a>]</td>
+                        </tr>
+                        <tr id="2">
+                            <td>2</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Piket Mingguan</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>28 September 2015</td>
+                            <td>Persetujuan Manajer/Wadek</td>
+                            <td>Belum disetujui Manajer</td>
+                            <td>-</td>
+                        </tr>
+                        <tr id="3">
+                            <td>3</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Seminar</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>23 September 2015</td>
+                            <td>Verifikasi SDM</td>
+                            <td>Menunggu kelengkapan dokumen</td>
+                            <td>-</td>
+                        </tr>
+                        <tr id="4">
+                            <td>4</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Persiapan Awal Semester</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>1 September 2015</td>
+                            <td>Proses Pembayaran</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+          </section>
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-3">
+            <p><b>Statistik Lembur Semua Unit Kerja</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a>[Unduh Laporan(.xls)]</a></p>
+            <p>Berikut ini adalah grafik statistik lembur pegawai untuk periode:</p>
+            <p>1 Agustus - 31 Agustus 2015 <a>[Ubah Periode]</a></p>
+            <div id="chart-unit-all"></div><br><br><br>
+            <p><b>Statistik Lembur Unit Kerja [Nama Unit Kerja]</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="button round tiny">Ganti Unit Kerja</a></p>
+            <div id="manunit-chart"></div>
+            <p><b>Gambaran Umum Lembur untuk Tendik: [Nama Pegawai]</b></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hari/Tanggal</th>
+                        <th>Judul</th>
+                        <th>Jumlah Jam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr<>
+                        <td>Senin/28 September 2015</td>
+                        <td>Support IT untuk kegiatan Compfest</td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr<>
+                        <td>Selasa/29 September 2015</td>
+                        <td>Support IT untuk kegiatan Instalasi Listrik</td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr<>
+                        <td>Rabu/30 September 2015</td>
+                        <td>Support IT untuk kegiatan Persiapan Kelas</td>
+                        <td>3 jam</td>
+                    </tr>
+                </tbody>
+            </table>
+          </section>
+        </div>
+
+    </div>
+
+</div>
+
+    <div id="add-pengajuan" class="reveal-modal " data-reveal>
+            <form id="add-new-user" action="{% url 'usermgmt:createUser' %}" method="post">
+                {% csrf_token %}
+                <fieldset style="font-size: small;">
+                    <legend style="font-size: medium">Formulir Pengajuan Lembur</legend>
+                    <p><i>Lengkapi formulir pengajuan lembur di bawah ini. Semua field wajib diisi.</i></p>
+                    <table style="width: 100%" id="table-pengajuan">
+                        <tr>
+                            <td>Judul</td>
+                            <td><input type="text" placeholder="Tulis judul lembur" style="font-size: small"></td>
+                        </tr>
+                        <tr class="tanggal">
+                            <td class="tgl-label" style="width: 20%">Tanggal/Waktu Lembur</td>
+                            <td><input type="date" style="font-size:small;width: 25%; display: inline;"> <input type="time" style="font-size:small;width: 17%; display: inline;"> - <input type="time" style="font-size:small;width: 17%; display:inline;">&nbsp;<input type="checkbox" style="display:inline;">&nbsp;akhir pekan / hari libur&nbsp;<div class="add-holder1" style="display:inline;"><a id="tambah-tgl" class="button round tiny" style="display: inline;"><b>+</b></a></div><div class="rm-holder1" style="display: inline;"></div> </td>
+                        </tr>
+                        <tr>
+                            <td>Tempat</td>
+                            <td><input type="text" placeholder="Tulis tempat lembur" style="font-size: small"></td>
+                        </tr>
+                        <tr class="pegawai">
+                            <td class="pegawai-label">Pegawai Lembur</td>
+                            <td><input type="text" placeholder="Cari nama pegawai" style="font-size:small;width:70%; display:inline;"><div class="add-holder2" style="display:inline;"><a id="tambah-pegawai" class="button round tiny" style="display:inline;">+</a></div><div class="rm-holder2" style="display: inline;"></div> </td>
+                        </tr>
+                        <tr>
+                            <td>Keterangan</td>
+                            <td><textarea style="font-size: small;" placeholder="Tulis deskripsi beban kerja dan jenis pekerjaan" rows="5" cols="1"></textarea></td>
+                        </tr>
+                    </table>
+                    <input type="checkbox"> Saya menyetujui bahwa data yang dimasukkan sudah benar adanya sesuai dengan penugasan lembur yang diberikan oleh Pimpinan.
+                </fieldset>
+                <a href="#" class="custom-close-modal button radius tiny">Ajukan Lembur</a>
+                <a href="#" class="custom-close-modal button radius tiny">Batal</a>
+                <input type="submit" value="Submit" style="visibility: hidden" />
+            </form>
+            <a class="close-reveal-modal">&#215;</a>
+        </div>
+
+    <div id="detail-pengajuan" class="reveal-modal " data-reveal>
+        <fieldset style="font-size: small">
+            <legend style="font-size: medium">Data Pengajuan Lembur</legend>
+            <table style="width: 100%">
+                <tr>
+                    <td>Judul</td>
+                    <td><input disabled placeholder="Tulis judul lembur" type="text" style="font-size: small"></td>
+                </tr>
+                <tr>
+                    <td style="width: 30%">Tanggal/Waktu Lembur</td>
+                    <td><input disabled type="date" style="font-size:small;width: 25%; display: inline;"> <input disabled type="time" style="font-size:small;width: 20%; display: inline;"> - <input disabled type="time" style="font-size:small;width: 20%; display:inline;"></div> </td>
+                </tr>
+                <tr>
+                    <td>Tempat</td>
+                    <td><input disabled placeholder="Fakultas Ilmu Komputer UI" type="datetime" style="font-size: small"></td>
+                </tr>
+                <tr>
+                    <td>Pegawai Lembur</td>
+                    <td><input disabled placeholder="Cari nama pegawai" type="text" style="font-size: small;width:70%; display:inline;"> </td>
+                </tr>
+                <tr>
+                    <td>Keterangan</td>
+                    <td><textarea style="font-size: small;" disabled placeholder="Tulis deskripsi beban kerja dan jenis pekerjaan" rows="5" cols="1"></textarea></td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td><input disabled placeholder="Nama status" type="text" style="font-size:small;width:70%; display:inline;"> </td>
+                </tr>
+            </table>
+            <p style="font-size: small;"><i>diperbarui tanggal 28 Sept 2015 pkl 13.00 [<a>lihat detail</a>]</i></p>
+            <a class="button round tiny" style="float: right;">Setujui Pengajuan Lembur</a>
+            <a class="button round tiny" style="float: left;">Tolak Pengajuan Lembur</a>
+            <br><br>
+            <ul class="accordion" data-accordion>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel2a">Daftar Hadir dan Rekapitulasi Honor Lembur</a>
+                <div id="panel2a" class="content active">
+                  <table>
+                      <caption>Daftar Hadir dan Rekapitulasi Honor Lembur</caption>
+                      <thead>
+                        <tr>
+                            <th style="width: 2%;">No</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Nama Pegawai</th>
+                            <th>Waktu Masuk</th>
+                            <th>Waktu Pulang</th>
+                            <th>Honor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>XYZ</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>ABC</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>DEF</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel1a">Dokumen Pendukung</a>
+                <div id="panel1a" class="content">
+                  <table style="width:75%;">
+                      <caption>Dokumen pendukung lembur di hari kerja biasa</caption>
+                      <tr>
+                          <td style="width: 25%;">Form Tugas Lembur</td>
+                          <td>FormLembur_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                  </table>
+                  <table style="width:75%;">
+                      <caption>Dokumen pendukung lembur di akhir pekan / hari libur</caption>
+                      <tr>
+                          <td style="width: 25%;">SPKL</td>
+                          <td>SPKL_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                      <tr>
+                          <td>Surat Tugas</td>
+                          <td>SuratTugas_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                      <tr>
+                          <td>Daftar Hadir</td>
+                          <td>DaftarHadir_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                  </table>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel3a">Riwayat Pengajuan Lembur</a>
+                <div id="panel3a" class="content">
+                  <table>
+                      <caption>Riwayat Pengajuan Lembur</caption>
+                      <thead>
+                        <tr>
+                            <th style="width: 2%;">No</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Waktu</th>
+                            <th>Status Pengajuan</th>
+                            <th>Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>10.00 AM</td>
+                            <td>Pengajuan Baru</td>
+                            <td>Belum disetujui manajer</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Selasa, 29 Sept 2015</td>
+                            <td>12.00 PM</td>
+                            <td>Pengajuan Baru</td>
+                            <td>Disetujui manajer</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Senin, 29 Sept 2015</td>
+                            <td>12.00 PM</td>
+                            <td>Kelengkapan Dokumen Pendukung</td>
+                            <td>Dokumen belum diunggah</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </li>
+            </ul>
+        </fieldset>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "No"){
+                $(this).html('');
+            }
+        } );
+
+        // DataTable
+        var tablePengajuan = $('#table-id-pengajuan').DataTable({"bAutoWidth": false});
+        var tableDitugasi = $('#table-id-ditugasi').DataTable({"bAutoWidth": false});
+
+        // Apply the search
+        tablePengajuan.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+        tableDitugasi.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+
+        // charts visualisasi laporan pegawai untuk manajer unit
+        $('#manunit-chart').highcharts({
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Grafik Visualisasi Lembur Pegawai di Unit Kerja [Nama Unit Kerja]',
+                style: {
+                    fontSize: 'small'
+                }
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Pegawai A', 'Pegawai B', 'Pegawai C', 'Pegawai D']
+            },
+            yAxis: {
+                title: {
+                    text: 'Jam Kerja'
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                    enableMouseTracking: false
+                }
+            },
+            series: [{
+                name: 'Total Jam Lembur',
+                data: [10, 20, 10, 40]
+            },]
+        });
+    });
+    $('a.custom-close-modal').click(function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+     // add new row in form
+      $(document).on("click", "#tambah-tgl",function()
+      {
+        var $tr = $(this).closest($("tr")).clone(true);
+        $(this).remove();
+        $("#table-pengajuan").find(".tanggal:last").after($tr);
+        $(".tgl-label:last").html("");
+        $(".rm-holder1:last").html("<a class='remove1 button round tiny' style='background-color:red;'>X</a>");
+        return false;
+      });
+      $(document).on("click", "#tambah-pegawai",function()
+      {
+        var $tr = $(this).closest($("tr")).clone(true);
+        $(this).remove();
+        $("#table-pengajuan").find(".pegawai:last").after($tr);
+        $(".pegawai-label:last").html("");
+        $(".rm-holder2:last").html("<a class='remove2 button round tiny' style='background-color:red;'>X</a>");
+        return false;
+      });
+      $(document).on("click", ".remove1",function(){
+          $add = $(this).closest("tr").find("#tambah-tgl")
+          $(this).closest("tr").remove();
+          if($(".remove1").length == 0 || $add){
+            $(".add-holder1:last").html("<a id='tambah-tgl' class='button round tiny' style='display: inline;'><b>+</b></a>");
+          }
+      });
+      $(document).on("click", ".remove2",function(){
+          $add = $(this).closest("tr").find("#tambah-pegawai")
+          $(this).closest("tr").remove();
+          if($(".remove2").length == 0 || $add){
+            $(".add-holder2:last").html("<a id='tambah-pegawai' class='button round tiny' style='display: inline;'><b>+</b></a>");
+          }
+      });
+</script>
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption {
+        font-size: small;
+    }
+</style>
+
+{% endblock %}

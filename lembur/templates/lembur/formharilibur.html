@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <fieldset class="a4">
+            <div class="kop-form" style="width:100%; display:block; overflow:auto; margin-bottom:5%;">
+                <div style="text-align:center; margin-right:auto; margin-left:auto;">
+                    <h6><b>SURAT TUGAS</b></h6>
+                    <p>735.A/UN2.F11.D2.SF2/OTL.03.SuratTugas/2015</p>
+                    <h6>{{ lemburform.deskripsi_pekerjaan }}</h6>
+                    <p><b>Depok, {{ hariini|date:'d F Y' }}</b></p>
+                </div>
+            </div>
+            <div class="isi-form" style="width:100%; display:block; overflow:auto;">
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left;">
+                        <p>Yang bertanda tangan dibawah ini :</p>
+                    </div>
+                </div>
+                <div style="width:100%; display:block; overflow:auto; margin-bottom:0.5cm;">
+                    <div style="text-align:left; float: left; margin-left:2cm; margin-right:0.5cm;">
+                        <label>Nama</label>
+                        <label>Jabatan</label>
+                        <label>NIP</label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <label>Dra. Kasiyah, M.Sc.</label>
+                        <label>Wakil Dekan Bidang Sumber Daya, Ventura dan Administrasi Umum</label>
+                        <label>196105101987032001</label>
+                    </div>
+                </div>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left;">
+                        <p>
+                            Dengan ini menugaskan kepada <b>{{ lemburform.pegawai.user.first_name }} {{ lemburform.pegawai.user.last_name }}</b> untuk <b>{{ lemburform.deskripsi_pekerjaan }}</b> yang akan dilaksanakan pada :
+                        </p>
+                    </div>
+                </div>
+                <div style="width:100%; display:block; overflow:auto; margin-bottom:0.5cm;">
+                    <div style="text-align:left; float: left; margin-left:2cm; margin-right:0.5cm;">
+                        <label>Hari/Tanggal</label>
+                        <label>Waktu</label>
+                        <label>Tempat</label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <label>{{ lemburform.tanggal|date:'l, d F Y' }}</label>
+                        <label>{{ lemburform.waktu_mulai|date:'H:i' }} s.d {{ lemburform.waktu_selesai|date:'H:i' }}</label>
+                        <label>{{ lemburform.tempat }}</label>
+                    </div>
+                </div>
+                <div style="width:100%; display:block; overflow:auto; margin-bottom:0.5cm;">
+                    <div style="text-align:left; float: left;">
+                        <p>
+                            Demikian Surat Tugas ini dibuat untuk dapat dipergunakan sebagaimana mestinya.
+                        </p>
+                    </div>
+                </div>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: right; width:35%;">
+                        <label>Depok, {{ hariini|date:'d F Y' }}</label>
+                        <br>
+                        <label>Wakil Dekan Bidang Sumber Daya, Ventura, Administrasi Umum</label>
+                        <br><br><br>
+                        <label><b>Dra. Kasiyah, M.Sc.</b></label>
+                        <label>NIP. 196105101987032001</label>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div style="float:right; margin-top:5px;">
+            <a class="button radius small" href="{% url 'lembur:pdfharilibur' id=lemburform.id %}">Generate Report</a>
+        </div>
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+    $(document).foundation();
+</script>
+
+<style>
+    .a4 {
+        width: 21cm;
+        height: 29.7cm;
+        margin: 0 auto;
+        padding: 2cm;
+    }
+</style>
+
+{% endblock %}

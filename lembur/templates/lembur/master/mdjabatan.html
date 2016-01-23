@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Master Data Jabatan</b></h6>
+        <a id="pop-create" data-reveal-id="pop-jabatan" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Create Jabatan</a>
+
+        <table id="md-jabatan" class="display table-data" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width:5%;">ID</th>
+                    <th>Jabatan</th>
+                </tr>
+            </thead>
+            <tfoot style="display: table-header-group">
+                <tr>
+                    <th>ID</th>
+                    <th>Jabatan</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% if mdjabatan %}
+            {% for j in mdjabatan %}
+                <tr id="{{ j.id }}">
+                    <td>#{{ j.id }}</td>
+                    <td><a class="data-jabatan" data-reveal-id="pop-jabatan" data-id-jabatan="{{ j.id }}">{{ j.jabatan }}</a></td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <p>Data jabatan kosong</p>
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div id="pop-jabatan" class="reveal-modal medium" data-reveal>
+    <form id="form-jabatan" class="forml">
+        {% csrf_token %}
+        <input name="idjabatan" type="hidden">
+        <input name="del" type="hidden">
+        <fieldset>
+            <legend>Master Data Jabatan</legend>
+            <div id="edit-del-holder" style="float: right; display: inline;"></div>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Jabatan</label>
+                    </td>
+                    <td>
+                        <input name="jabatan" type="text">
+                    </td>
+                </tr>
+            </table>
+            <input name="submit-ajukan" type="hidden">
+            <button class="custom-close-modal button radius tiny" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="ajukan" style="float: right; margin-left: 2px;">Submit</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p>
+        <h5 id="pesan-konfirmasi">Apakah anda yakin untuk membuat jabatan baru?</h5>
+    </p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tablelembur = $('#md-jabatan').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tablelembur.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // initial state modal ajukan jabatan
+    $('#pop-jabatan').data('initial-state', $('#pop-jabatan').html());
+    // initial state konfirmasi
+    $('#konfirmasi').data('initial-state', $('#konfirmasi').html());
+
+    // button pop create
+    $(document).on('click', '#pop-create', function(){
+        $('#pop-jabatan').html($('#pop-jabatan').data('initial-state'));
+    });
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button ajukan
+    $(document).on('click', '.ajukan', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=submit-ajukan]').val('submitajukan');
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        $('#form-jabatan input[name=submit-ajukan]').val('');
+        $('#form-jabatan').submit();
+    });
+
+    // submit form jabatan
+    $(document).on("submit", "#form-jabatan", function(e){
+        e.preventDefault();
+        if ($('#form-jabatan input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').html($('#konfirmasi').data('initial-state'));
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else if ($('#form-jabatan input[name=del]').val() == 'delete') {
+            form = $('#form-jabatan').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Data jabatan sedang di delete ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mddeletejabatan/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil di delete");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jabatan').html($('#pop-jabatan').data('initial-state'));
+                    $('#md-jabatan #'+response.jabatan).remove();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil di delete, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else if ($('#form-jabatan input[name=idjabatan]').val() != '') {
+            form = $('#form-jabatan').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Perubahan jabatan sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdeditjabatan/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jabatan').html($('#pop-jabatan').data('initial-state'));
+                    var jabatan = '#'+response.jabatan;
+                    var namajabatan = "<a class='data-jabatan' data-reveal-id='pop-jabatan' data-id-jabatan="+response.jabatan+">"+response.namajabatan+"</a>";
+                    var baris = $('#md-jabatan #'+response.jabatan);
+                    $('#md-jabatan').DataTable().row(baris).data([jabatan, namajabatan]).draw();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else {
+            form = $('#form-jabatan').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Pembuatan jabatan sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdcreatejabatan/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jabatan').html($('#pop-jabatan').data('initial-state'));
+                    var jabatan = '#'+response.jabatan;
+                    var namajabatan = "<a class='data-jabatan' data-reveal-id='pop-jabatan' data-id-jabatan="+response.jabatan+">"+response.namajabatan+"</a>";
+                    var newrow = $('#md-jabatan').DataTable().row.add([jabatan, namajabatan]).draw().node();
+                    $(newrow).prop('id', response.jabatan);
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        }
+    });
+
+    // open lihat jabatan
+    $(document).on('click', 'tbody tr td .data-jabatan', function(){
+        var id = $(this).data('idJabatan');
+        var isieditdel = '<a id="edit-jabatan"><i class="fi-pencil size-24"></i> Edit </a> &nbsp;&nbsp;&nbsp;' +
+                '<a id="delete-jabatan"><i class="fi-trash size-24"></i>  Delete </a>';
+        $.ajax({
+            type: 'POST',
+            url: '../../mdviewjabatan/',
+            data: {jabatan: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#pop-jabatan').html($('#pop-jabatan').data('initial-state'));
+                $('#pop-jabatan input[name=idjabatan]').val(response.jabatan);
+                $('#pop-jabatan input[name=jabatan]').val(response.namajabatan);
+                $('#pop-jabatan input[name=jabatan]').prop('readonly', true);
+                $('#pop-jabatan #edit-del-holder').html(isieditdel);
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // tombol edit dan save
+    $(document).on("click", "#edit-jabatan", function(){
+        $(this).closest("fieldset").find("table input[name=jabatan]").prop("readonly", false);
+        $(this).html('<i class="fi-save size-24"></i> Save ');
+        $(this).attr("id", "save-jabatan");
+    });
+    $(document).on("click", "#save-jabatan", function(){
+        $(this).closest("fieldset").find("table input[name=jabatan]").prop("readonly", true);
+        $(this).html('<i class="fi-pencil size-24"></i> Edit ');
+        $(this).attr("id", "edit-jabatan");
+    });
+
+    // tombol delete jabatan
+    $(document).on("click", "#delete-jabatan", function(){
+        $('#form-jabatan input[name=del]').val('delete');
+        $('#konfirmasi #pesan-konfirmasi').html('Apakah anda yakin ingin menghapus jabatan ini?');
+        $('#konfirmasi').foundation('reveal', 'open');
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

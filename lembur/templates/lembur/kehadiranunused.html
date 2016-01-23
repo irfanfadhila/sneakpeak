@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Laporan Detil Kehadiran Pegawai</b></h6>
+        <table style="width:100%;">
+            <caption>Rekapitulasi Kehadiran Pegawai berdasarkan Mesin Absensi</caption>
+            <thead>
+                <tr>
+                    <td>Hari</td>
+                    <td>Tanggal</td>
+                    <td>Nama Pegawai</td>
+                    <td>Jam Masuk - Keluar</td>
+                    <td>Jml Waktu Hadir</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai A</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                </tr>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai B</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                </tr>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai C</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Total</td>
+                    <td>10.00 jam</td>
+                </tr>
+            </tbody>
+        </table>
+        <table style="width:100%;">
+            <caption>Rekapitulasi Kehadiran dan Honor Lembur Pegawai</caption>
+            <thead>
+                <tr>
+                    <td>Hari</td>
+                    <td>Tanggal</td>
+                    <td>Nama Pegawai</td>
+                    <td>Jam Masuk - Keluar</td>
+                    <td>Jml Waktu Hadir</td>
+                    <td>Jml Waktu Lembur</td>
+                    <td>Jml Waktu +/-</td>
+                    <td>Uang Lembur</td>
+                    <td>Uang Makan</td>
+                    <td>Uang Transport</td>
+                    <td>Total Uang Lembur</td>
+                    <td>Ket</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai A</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                    <td>3.00 jam</td>
+                    <td>0 jam</td>
+                    <td>Rp 59.000</td>
+                    <td>Rp 21.500</td>
+                    <td>Rp 0</td>
+                    <td>Rp 81.000</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai B</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                    <td>3.00 jam</td>
+                    <td>0 jam</td>
+                    <td>Rp 59.000</td>
+                    <td>Rp 21.500</td>
+                    <td>Rp 0</td>
+                    <td>Rp 81.000</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Senin</td>
+                    <td>28 September 2015</td>
+                    <td>Pegawai C</td>
+                    <td>17.00 - 20.00</td>
+                    <td>3.00 jam</td>
+                    <td>3.00 jam</td>
+                    <td>0 jam</td>
+                    <td>Rp 59.000</td>
+                    <td>Rp 21.500</td>
+                    <td>Rp 0</td>
+                    <td>Rp 81.000</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Total</td>
+                    <td>10.00 jam</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Rp 255.750</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+    $(document).foundation();
+</script>
+<style>
+    table thead tr th, table tbody tr td, table caption {
+        font-size: small;
+    }
+</style>
+{% endblock %}

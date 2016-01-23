@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Master Data Pegawai</b></h6>
+        <a id="pop-create" data-reveal-id="pop-pegawai" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Create Pegawai</a>
+
+        <table id="md-pegawai" class="display table-data" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width:5%;">ID</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Telepon</th>
+                    <th>Unit</th>
+                    <th>Jabatan</th>
+                    <th>Permission</th>
+                </tr>
+            </thead>
+            <tfoot style="display: table-header-group">
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Telepon</th>
+                    <th>Unit</th>
+                    <th>Jabatan</th>
+                    <th>Permission</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% if mdpegawai %}
+            {% for p in mdpegawai %}
+                <tr id="{{ p.id }}">
+                    <td>#{{ p.id }}</td>
+                    <td><a class="data-pegawai" data-reveal-id="pop-pegawai" data-id-pegawai="{{ p.id }}">{{ p.user.first_name }} {{ p.user.last_name }}</a></td>
+                    <td>{{ p.nip }}</td>
+                    <td>{{ p.telepon }}</td>
+                    <td>{{ p.unit.unit }}</td>
+                    <td>{{ p.jabatan.jabatan }}</td>
+                    <td>{{ p.permission.permission }}</td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <p>Data pegawai kosong</p>
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div id="pop-pegawai" class="reveal-modal medium" data-reveal>
+    <form id="form-pegawai" class="forml">
+        {% csrf_token %}
+        <input name="idpegawai" type="hidden">
+        <input name="del" type="hidden">
+        <fieldset>
+            <legend>Master Data Pegawai</legend>
+            <div id="edit-del-holder" style="float: right; display: inline;"></div>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Nama</label>
+                    </td>
+                    <td>
+                        <input class="auto-pegawai" type="text" required>
+                        <input name="pegawai" type="hidden">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>NIP</label>
+                    </td>
+                    <td>
+                        <input name="nip" type="text">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Telepon</label>
+                    </td>
+                    <td>
+                        <input name="telepon" type="text">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Unit</label>
+                    </td>
+                    <td>
+                        <select name="unit" required>
+                            <option></option>
+                            {% for su in selectunit %}
+                                <option value="{{ su.id }}">{{ su.unit }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Jabatan</label>
+                    </td>
+                    <td>
+                        <select name="jabatan" required>
+                            <option></option>
+                            {% for sj in selectjabatan %}
+                                <option value="{{ sj.id }}">{{ sj.jabatan }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Permission</label>
+                    </td>
+                    <td>
+                        <select name="permission" required>
+                            <option></option>
+                            {% for sp in selectpermission %}
+                                <option value="{{ sp.id }}">{{ sp.permission }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <input name="submit-ajukan" type="hidden">
+            <button class="custom-close-modal button radius tiny" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="ajukan" style="float: right; margin-left: 2px;">Submit</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p>
+        <h5 id="pesan-konfirmasi">Apakah anda yakin untuk membuat komponen lembur baru?</h5>
+    </p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tablelembur = $('#md-pegawai').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tablelembur.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // autocomplete isi user
+    $(document).on("focus", ".auto-pegawai", function(e){
+        $(this).autocomplete({
+            source: "../../cariuser/",
+            change: function(e, ui){
+                if (ui.item==null){
+                    $(this).val('');
+                }
+            },
+            focus: function(e, ui){
+                $(this).val(ui.item.label);
+                return false;
+            },
+            select: function(e, ui){
+                $(this).val(ui.item.label);
+                $(this).closest('div').find('input[name=pegawai]').val(ui.item.value);
+                return false;
+            }
+        });
+    });
+
+    // initial state modal ajukan pegawai
+    $('#pop-pegawai').data('initial-state', $('#pop-pegawai').html());
+    // initial state konfirmasi
+    $('#konfirmasi').data('initial-state', $('#konfirmasi').html());
+
+    // button pop create
+    $(document).on('click', '#pop-create', function(){
+        $('#pop-pegawai').html($('#pop-pegawai').data('initial-state'));
+    });
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button ajukan
+    $(document).on('click', '.ajukan', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=submit-ajukan]').val('submitajukan');
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        $('#form-pegawai input[name=submit-ajukan]').val('');
+        $('#form-pegawai').submit();
+    });
+
+    // submit form pegawai
+    $(document).on("submit", "#form-pegawai", function(e){
+        e.preventDefault();
+        if ($('#form-pegawai input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').html($('#konfirmasi').data('initial-state'));
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else if ($('#form-pegawai input[name=del]').val() == 'delete') {
+            form = $('#form-pegawai').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Data pegawai sedang di delete ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mddeletepegawai/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil di delete");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-pegawai').html($('#pop-pegawai').data('initial-state'));
+                    $('#md-pegawai #'+response.pegawai).remove();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil di delete, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else if ($('#form-pegawai input[name=idpegawai]').val() != '') {
+            form = $('#form-pegawai').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Perubahan pegawai sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdeditpegawai/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-pegawai').html($('#pop-pegawai').data('initial-state'));
+                    var pegawai = '#'+response.pegawai;
+                    var nama = "<a class='data-pegawai' data-reveal-id='pop-pegawai' data-id-pegawai="+response.pegawai+">"+response.nama+"</a>";
+                    var nip = response.nip;
+                    var telepon = response.telepon;
+                    var unit = response.unit;
+                    var jabatan = response.jabatan;
+                    var permission = response.permission;
+                    var baris = $('#md-pegawai #'+response.pegawai);
+                    $('#md-pegawai').DataTable().row(baris).data([pegawai, nama, nip, telepon, unit, jabatan, permission]).draw();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else {
+            form = $('#form-pegawai').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Pembuatan pegawai sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdcreatepegawai/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-pegawai').html($('#pop-pegawai').data('initial-state'));
+                    var pegawai = '#'+response.pegawai;
+                    var nama = "<a class='data-pegawai' data-reveal-id='pop-pegawai' data-id-pegawai="+response.pegawai+">"+response.nama+"</a>";
+                    var nip = response.nip;
+                    var telepon = response.telepon;
+                    var unit = response.unit;
+                    var jabatan = response.jabatan;
+                    var permission = response.permission;
+                    var newrow = $('#md-pegawai').DataTable().row.add([pegawai, nama, nip, telepon, unit, jabatan, permission]).draw().node();
+                    $(newrow).prop('id', response.pegawai);
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        }
+    });
+
+    // open lihat pegawai
+    $(document).on('click', 'tbody tr td .data-pegawai', function(){
+        var id = $(this).data('idPegawai');
+        var isieditdel = '<a id="edit-pegawai"><i class="fi-pencil size-24"></i> Edit </a> &nbsp;&nbsp;&nbsp;' +
+                '<a id="delete-pegawai"><i class="fi-trash size-24"></i>  Delete </a>';
+        $.ajax({
+            type: 'POST',
+            url: '../../mdviewpegawai/',
+            data: {pegawai: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#pop-pegawai').html($('#pop-pegawai').data('initial-state'));
+                $('#pop-pegawai input[name=idpegawai]').val(response.pegawai);
+                $('#pop-pegawai .auto-pegawai').val(response.nama);
+                $('#pop-pegawai input[name=pegawai]').val(response.namaid);
+                $('#pop-pegawai input[name=nip]').val(response.nip);
+                $('#pop-pegawai input[name=telepon]').val(response.telepon);
+                $('#pop-pegawai select[name=unit]').val(response.unit);
+                $('#pop-pegawai select[name=jabatan]').val(response.jabatan);
+                $('#pop-pegawai select[name=permission]').val(response.permission);
+                $('#pop-pegawai .auto-pegawai').prop('readonly', true);
+                $('#pop-pegawai input[name=nip]').prop('readonly', true);
+                $('#pop-pegawai input[name=telepon]').prop('readonly', true);
+                $('#pop-pegawai select[name=unit]').prop('disabled', true);
+                $('#pop-pegawai select[name=jabatan]').prop('disabled', true);
+                $('#pop-pegawai select[name=permission]').prop('disabled', true);
+                $('#pop-pegawai #edit-del-holder').html(isieditdel);
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // tombol edit dan save
+    $(document).on("click", "#edit-pegawai", function(){
+        $(this).closest("fieldset").find("table input").prop("readonly", false);
+        $(this).closest("fieldset").find("table select").prop("disabled", false);
+        $(this).html('<i class="fi-save size-24"></i> Save ');
+        $(this).attr("id", "save-pegawai");
+    });
+    $(document).on("click", "#save-pegawai", function(){
+        $(this).closest("fieldset").find("table input").prop("readonly", true);
+        $(this).closest("fieldset").find("table select").prop("disabled", true);
+        $(this).html('<i class="fi-pencil size-24"></i> Edit ');
+        $(this).attr("id", "edit-pegawai");
+    });
+
+    // tombol delete pegawai
+    $(document).on("click", "#delete-pegawai", function(){
+        $('#form-pegawai input[name=del]').val('delete');
+        $('#konfirmasi #pesan-konfirmasi').html('Apakah anda yakin ingin menghapus pegawai ini?');
+        $('#konfirmasi').foundation('reveal', 'open');
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+    .ui-autocomplete-input {
+      border: none;
+      font-size: 14px;
+      width: 300px;
+      height: 24px;
+      margin-bottom: 5px;
+      padding-top: 2px;
+      border: 1px solid #DDD !important;
+      padding-top: 0px !important;
+      z-index: 1511;
+      position: relative;
+    }
+    .ui-menu .ui-menu-item a {
+      font-size: small;
+    }
+    .ui-autocomplete {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1510 !important;
+      float: left;
+      display: none;
+      min-width: 160px;
+      width: 160px;
+      padding: 4px 0;
+      margin: 2px 0 0 0;
+      list-style: none;
+      background-color: #ffffff;
+      border-color: #ccc;
+      border-color: rgba(0, 0, 0, 0.2);
+      border-style: solid;
+      border-width: 1px;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
+      *border-right-width: 2px;
+      *border-bottom-width: 2px;
+    }
+    .ui-menu-item > a.ui-corner-all {
+        display: block;
+        padding: 3px 15px;
+        clear: both;
+        font-weight: normal;
+        line-height: 18px;
+        color: #555555;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .ui-state-hover, .ui-state-active {
+          color: #ffffff;
+          text-decoration: none;
+          background-color: #0088cc;
+          border-radius: 0px;
+          -webkit-border-radius: 0px;
+          -moz-border-radius: 0px;
+          background-image: none;
+    }
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+</style>
+
+{% endblock %}

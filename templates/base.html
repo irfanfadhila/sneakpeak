@@ -1,0 +1,99 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/jpg" href="{% static 'image/fasilkom-merah-biru.jpg' %}" >
+    <title>SISDM | Site</title>
+    <!-- Foundation -->
+    <link rel="stylesheet" href="{% static 'css/foundation.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/foundation-icons/foundation-icons.css' %}"/>
+    <script src="{% static 'js/vendor/modernizr.js' %}"></script>
+</head>
+<body>
+
+<div class="row">
+    <div class="large-12 columns">
+        <h1><img src="{% static 'image/logo-fasilkom-baru.png' %}" width="20%">
+            <small>Sistem Informasi SDM</small>
+        </h1>
+        <hr/>
+        {% if request.user.is_authenticated %}
+        <div class="sticky">
+        <nav class="top-bar" data-topbar role="menubar">
+          <section class="top-bar-section">
+            <!-- Right Nav Section -->
+            <ul class="right">
+              <<li><a href="/accounts/logout">Logout</a></li>
+            </ul>
+
+            <!-- Left Nav Section -->
+            <ul class="left">
+            {% if lembur %}
+              <li role="menuitem"><a href="{% url 'lembur:index' %}">SiLembur</a></li>
+              {% if pegawai %}
+              <li {% if cursor == 'pegawai' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='pegawai' %}">Lembur {{ request.user.first_name }}</a></li>
+              <li {% if cursor == 'pembayaranlembur' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='pembayaranlembur' %}">Cetak Surat Lembur</a></li>
+              {% elif manager %}
+              <li {% if cursor == 'manager' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='manager' %}" >Menunggu Persetujuan Saya</a></li>
+              <li {% if cursor == 'lemburunit' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='lemburunit' %}">Lembur Unit {{ manager.unit.unit }}</a></li>
+              {% elif piclembur %}
+              <li {% if cursor == 'piclembur' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='piclembur' %}">Menunggu Verifikasi</a></li>
+              <li {% if cursor == 'pembayaranselesai' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='pembayaranselesai' %}">Pembayaran Selesai</a></li>
+              <li {% if cursor == 'laporankeuangan' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='laporankeuangan' %}">Laporan Keuangan</a></li>
+              <li {% if cursor == 'keuanganperminggu' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='keuanganperminggu' %}">Laporan Perorangan Perminggu</a></li>
+              {% elif managersdm %}
+              <li>kakakak</li>
+              {% elif master %}
+              <li {% if cursor == 'master' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='master' %}">Pegawai</a></li>
+              <li {% if cursor == 'masterjabatan' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterjabatan' %}">Jabatan</a></li>
+              <li {% if cursor == 'masterjenis' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterjenis' %}">Jenis Lembur</a></li>
+              <li {% if cursor == 'masterkomponen' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterkomponen' %}">Komponen Lembur</a></li>
+              <li {% if cursor == 'masterlembur' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterlembur' %}">Lembur</a></li>
+              <li {% if cursor == 'masterstatus' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterstatus' %}">Status Lembur</a></li>
+              <li {% if cursor == 'masterunit' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterunit' %}">Unit</a></li>
+              <li {% if cursor == 'masterpermission' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:lembur' ket='masterpermission' %}">Permission Lembur</a></li>
+              {% else %}
+              <li role="menuitem"><a href="{% url 'lembur:index' %}">Kembali ke login Lembur</a></li>
+              {% endif %}
+            {% else %}
+              <li {% if cursor == 'home' %} class="active" {% endif %} role="menuitem"><a href="{% url 'adminsdm:index' %}">Home</a></li>
+              <li {% if cursor == 'usrmgmt' %} class="active" {% endif %} role="menuitem"><a href="{% url 'usermgmt:index' %}">User Management</a></li>
+              <li {% if cursor == 'profil' %} class="active" {% endif %} role="menuitem"><a href="{% url 'adminsdm:profilpegawai' %}">Profil Pegawai</a></li>
+              <li {% if cursor == 'angk' %} class="active" {% endif %} role="menuitem"><a href="{% url 'adminsdm:angkakredit' %}">Angka Kredit</a></li>
+              <li role="menuitem"><a href="#">Peer Review</a></li>
+              <li {% if cursor == 'laporan' %} class="active" {% endif %} role="menuitem"><a href="{% url 'laporan:index' %}">Laporan</a></li>
+              <li {% if cursor == 'log' %} class="active" {% endif %} role="menuitem"><a href="{% url 'adminsdm:logactivity' %}">Log Activity</a></li>
+              <li {% if cursor == 'lembur' %} class="active" {% endif %} role="menuitem"><a href="{% url 'lembur:index' %}">Lembur</a></li>
+            {% endif %}
+            </ul>
+          </section>
+        </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="min-height: 50%; padding-top: 1%">
+    {% block content %}{% endblock %}
+</div>
+
+<footer class="row">
+    <div class="large-12 columns">
+        <hr/>
+        <div class="row">
+            <div class="large-6 columns">
+                <p style="font-size: small;">© Copyright Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+            </div>
+            {% if request.user.is_authenticated %}
+            <div class="right">
+                <a href="{% url 'mainapp:logout' %}">-</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

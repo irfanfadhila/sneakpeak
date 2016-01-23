@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <fieldset class="a4">
+            <div class="kop-form" style="width:100%; display:block; overflow:auto; margin-bottom:5%;">
+                <div style="float:left;">
+                    <img src="{% static 'image/fasilkom-merah-biru.jpg' %}">
+                </div>
+                <div style="float:left; text-align:center; margin-left:1cm;">
+                    <h4><b>Fakultas Ilmu Komputer</b></h4>
+                    <h4><b>Universitas Indonesia</b></h4>
+                </div>
+            </div>
+            <div class="isi-form" style="width:100%; display:block; overflow:auto;">
+                <div style="text-align:center; margin-bottom:3%;">
+                    <h4><b>TUGAS LEMBUR</b></h4>
+                </div>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left; margin-right:0.5cm;">
+                        <label>Diperintahkan</label>
+                        <label>Nama</label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <br>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <br>
+                        <label>{{ lemburform.pegawai.user.first_name }} {{ lemburform.pegawai.user.last_name }}</label>
+                    </div>
+                </div>
+                <br>
+                <label><b>Untuk melaksanakan tugas lembur pada</b></label>
+                <br>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left; margin-right:0.5cm;">
+                        <label>Hari</label>
+                        <label>Tanggal</label>
+                        <label>Ditugaskan pukul</label>
+                        <label>Yang dikerjakan</label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <label>{{ lemburform.tanggal|date:'l' }}</label>
+                        <label>{{ lemburform.tanggal|date:'d F Y' }}</label>
+                        <label>{{ lemburform.waktu_mulai|date:'H:i' }} - {{ lemburform.waktu_selesai|date:'H:i' }}</label>
+                        <label>{{ lemburform.deskripsi_pekerjaan }}</label>
+                    </div>
+                </div>
+                <br>
+                <label><b>Surat tugas lembur ini diserahkan setelah ditanda tangani lengkap</b></label>
+                <br>
+                <div style="text-align:center;border:solid;margin-bottom:3%;">
+                    <h5><b>DIISI OLEH BAGIAN SDM</b></h5>
+                </div>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left; margin-right:0.5cm;">
+                        <label><b>Telah dilaksanakan</b></label>
+                        <label><b>Tanggal</b></label>
+                        <label><b>Jam</b></label>
+                        <label><b>Waktu</b></label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <br>
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <br>
+                        <label>{{ lemburform.tanggal|date:'d F Y' }}</label>
+                        <label>{{ lemburform.waktu_masuk|date:'H:i' }} s/d {{ lemburform.waktu_keluar|date:'H:i' }}</label>
+                        <label>{{ waktu_h }} jam {{ waktu_m }} menit</label>
+                    </div>
+                </div>
+                <br>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:left; float: left; margin-right:0.5cm;">
+                        <label><b>Bantuan</b></label>
+                        <label><b>Makan</b></label>
+                        <label><b>Transport</b></label>
+                    </div>
+                    <div style="text-align:left; float:left; margin-right:0.5cm;">
+                        <label>:</label>
+                        <label>:</label>
+                        <label>:</label>
+                    </div>
+                    <div style="text-align:left; float:left;">
+                        <label>Rp {{ bantuan }},00</label>
+                        <label>Rp {{ makan }},00</label>
+                        <label>Rp {{ transport }},00</label>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <div style="width:100%; display:block; overflow:auto;">
+                    <div style="text-align:center; margin-bottom:0.5cm;">
+                        <label><b>Mengetahui</b></label>
+                    </div>
+                    <div style="text-align:center; float:left;">
+                        <label><b>Pelaksana Kerja</b></label>
+                        <br><br><br>
+                        <label>({{ lemburform.pegawai.user.first_name }} {{ lemburform.pegawai.user.last_name }})</label>
+                    </div>
+                    <div style="text-align:center; float:right;">
+                        <label><b>Pemberi Tugas</b></label>
+                        <br><br><br>
+                        <label>({{ manajer.user.first_name }} {{ manajer.user.last_name }})</label>
+                    </div>
+                </div>
+            </div>    
+            
+        </fieldset>
+        <div style="float:right; margin-top:5px;">
+            <a class="button radius small" href="{% url 'lembur:pdfharikerja' id=lemburform.id %}">Generate Report</a>
+        </div>
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+    $(document).foundation();
+</script>
+
+<style>
+    .a4 {
+        width: 21cm;
+        height: 29.7cm;
+        margin: 0 auto;
+        padding: 2cm;
+    }
+</style>
+
+{% endblock %}

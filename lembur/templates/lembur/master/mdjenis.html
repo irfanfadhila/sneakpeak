@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Master Data Jenis Lembur</b></h6>
+        <a id="pop-create" data-reveal-id="pop-jenis" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Create Jenis Lembur</a>
+
+        <table id="md-jenis" class="display table-data" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width:5%;">ID</th>
+                    <th>Jenis Lembur</th>
+                </tr>
+            </thead>
+            <tfoot style="display: table-header-group">
+                <tr>
+                    <th>ID</th>
+                    <th>Jenis Lembur</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% if mdjenis %}
+            {% for j in mdjenis %}
+                <tr id="{{ j.id }}">
+                    <td>#{{ j.id }}</td>
+                    <td><a class="data-jenis" data-reveal-id="pop-jenis" data-id-jenis="{{ j.id }}">{{ j.jenis_lembur }}</a></td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <p>Data jenis lembur kosong</p>
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div id="pop-jenis" class="reveal-modal medium" data-reveal>
+    <form id="form-jenis" class="forml">
+        {% csrf_token %}
+        <input name="idjenis" type="hidden">
+        <input name="del" type="hidden">
+        <fieldset>
+            <legend>Master Data Jenis Lembur</legend>
+            <div id="edit-del-holder" style="float: right; display: inline;"></div>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Jenis Lembur</label>
+                    </td>
+                    <td>
+                        <input name="jenis" type="text">
+                    </td>
+                </tr>
+            </table>
+            <input name="submit-ajukan" type="hidden">
+            <button class="custom-close-modal button radius tiny" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="ajukan" style="float: right; margin-left: 2px;">Submit</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p>
+        <h5 id="pesan-konfirmasi">Apakah anda yakin untuk membuat jenis lembur baru?</h5>
+    </p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tablelembur = $('#md-jenis').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tablelembur.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // initial state modal ajukan jenis
+    $('#pop-jenis').data('initial-state', $('#pop-jenis').html());
+    // initial state konfirmasi
+    $('#konfirmasi').data('initial-state', $('#konfirmasi').html());
+
+    // button pop create
+    $(document).on('click', '#pop-create', function(){
+        $('#pop-jenis').html($('#pop-jenis').data('initial-state'));
+    });
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button ajukan
+    $(document).on('click', '.ajukan', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=submit-ajukan]').val('submitajukan');
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        $('#form-jenis input[name=submit-ajukan]').val('');
+        $('#form-jenis').submit();
+    });
+
+    // submit form jenis
+    $(document).on("submit", "#form-jenis", function(e){
+        e.preventDefault();
+        if ($('#form-jenis input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').html($('#konfirmasi').data('initial-state'));
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else if ($('#form-jenis input[name=del]').val() == 'delete') {
+            form = $('#form-jenis').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Data jenis sedang di delete ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mddeletejenislembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil di delete");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jenis').html($('#pop-jenis').data('initial-state'));
+                    $('#md-jenis #'+response.jenis).remove();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil di delete, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else if ($('#form-jenis input[name=idjenis]').val() != '') {
+            form = $('#form-jenis').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Perubahan jenis lembur sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdeditjenislembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jenis').html($('#pop-jenis').data('initial-state'));
+                    var jenis = '#'+response.jenis;
+                    var jenislembur = "<a class='data-jenis' data-reveal-id='pop-jenis' data-id-jenis="+response.jenis+">"+response.jenislembur+"</a>";
+                    var baris = $('#md-jenis #'+response.jenis);
+                    $('#md-jenis').DataTable().row(baris).data([jenis, jenislembur]).draw();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else {
+            form = $('#form-jenis').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Pembuatan jenis lembur sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdcreatejenislembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-jenis').html($('#pop-jenis').data('initial-state'));
+                    var jenis = '#'+response.jenis;
+                    var jenislembur = "<a class='data-jenis' data-reveal-id='pop-jenis' data-id-jenis="+response.jenis+">"+response.jenislembur+"</a>";
+                    var newrow = $('#md-jenis').DataTable().row.add([jenis, jenislembur]).draw().node();
+                    $(newrow).prop('id', response.jenis);
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        }
+    });
+
+    // open lihat jenis lembur
+    $(document).on('click', 'tbody tr td .data-jenis', function(){
+        var id = $(this).data('idJenis');
+        var isieditdel = '<a id="edit-jenis"><i class="fi-pencil size-24"></i> Edit </a> &nbsp;&nbsp;&nbsp;' +
+                '<a id="delete-jenis"><i class="fi-trash size-24"></i>  Delete </a>';
+        $.ajax({
+            type: 'POST',
+            url: '../../mdviewjenislembur/',
+            data: {jenis: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#pop-jenis').html($('#pop-jenis').data('initial-state'));
+                $('#pop-jenis input[name=idjenis]').val(response.jenis);
+                $('#pop-jenis input[name=jenis]').val(response.jenislembur);
+                $('#pop-jenis input[name=jenis]').prop('readonly', true);
+                $('#pop-jenis #edit-del-holder').html(isieditdel);
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // tombol edit dan save
+    $(document).on("click", "#edit-jenis", function(){
+        $(this).closest("fieldset").find("table input[name=jenis]").prop("readonly", false);
+        $(this).html('<i class="fi-save size-24"></i> Save ');
+        $(this).attr("id", "save-jenis");
+    });
+    $(document).on("click", "#save-jenis", function(){
+        $(this).closest("fieldset").find("table input[name=jenis]").prop("readonly", true);
+        $(this).html('<i class="fi-pencil size-24"></i> Edit ');
+        $(this).attr("id", "edit-jenis");
+    });
+
+    // tombol delete jenis
+    $(document).on("click", "#delete-jenis", function(){
+        $('#form-jenis input[name=del]').val('delete');
+        $('#konfirmasi #pesan-konfirmasi').html('Apakah anda yakin ingin menghapus jenis ini?');
+        $('#konfirmasi').foundation('reveal', 'open');
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

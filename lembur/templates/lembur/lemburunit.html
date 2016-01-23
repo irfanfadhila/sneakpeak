@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Daftar Lembur Unit {{ manager.unit.unit }}</b></h6>
+        <a data-reveal-id="ajukan-lembur" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Ajukan Lembur</a>
+
+        <table id="lembur-unit" class="display table-data" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width:5%;">ID</th>
+                    <th>Deskripsi Pekerjaan</th>
+                    <th>Hari, Tanggal</th>
+                    <th>Waktu Kerja</th>
+                    <th>Pegawai</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tfoot style="display: table-header-group">
+                <tr>
+                    <th>ID</th>
+                    <th>Deskripsi Pekerjaan</th>
+                    <th>Hari, Tanggal</th>
+                    <th>Waktu Kerja</th>
+                    <th>Pegawai</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% if lemburunit %}
+            {% for lu in lemburunit %}
+                <tr id="{{ lu.id }}">
+                    <td>#{{ lu.id }}</td>
+                    <td><a class="data-lembur" data-reveal-id="lihat-lembur" data-id-lembur="{{ lu.id }}">{{ lu.deskripsi_pekerjaan }}</a></td>
+                    <td>{{ lu.tanggal }}</td>
+                    <td>{{ lu.waktu_mulai|time:'H:i' }} - {{ lu.waktu_selesai|time:'H:i' }}</td>
+                    <td>{{ lu.pegawai.user.first_name }}</td>
+                    <td>{{ lu.status.status }}</td>
+                    <td>{{ lu.created_by.user.first_name }}</td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <p>Unit ini tidak memiliki catatan lembur</p>
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div id="ajukan-lembur" class="reveal-modal medium" data-reveal>
+    <form id="form-lembur" class="forml">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Formulir Pengajuan Lembur</legend>
+            <p style="display: inline;"><i>Mohon lengkapi formulir di bawah ini, semua field wajib diisi.</i></p>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <div style="display: block; overflow: auto;">
+            <table style="width: 50%; float: left;">
+                <tr>
+                    <td>
+                        <label>Deskripsi Pekerjaan</label>
+                        <textarea name="deskripsi" rows="5" required></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Nama</label>
+                        <div class="isi-pegawai">
+                            <input class="auto-pegawai" type="text" required>
+                            <input name="pegawai" type="hidden">
+                        </div>
+                        <div style="float: right;">
+                            <a id="tambah-pegawai" class="tambah"><i class="fi-plus"></i></a>
+                            <a id="kurang-pegawai" class="kurang"><i class="fi-minus"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 50%; float:right;">
+                <tr>
+                    <td>
+                        <div class="isi-tanggal" style="display:block; overflow:auto;">
+                            <div style="width:45%; float:left;">
+                                <label>Waktu Kerja</label>
+                                Mulai <input name="mulai" type="time" required>
+                                Selesai <input name="selesai" type="time" required>
+                            </div>
+                            <div style="width:45%; float:right;">
+                                <label>Hari, Tanggal</label>
+                                <input name="tanggal" type="date" required>
+                                <input class="jenis-lembur" type="checkbox"> Akhir Pekan / Hari Libur
+                                <input name="jenis" type="hidden">
+                            </div>
+                        </div>
+                        <div style="float: right;">
+                            <a id="tambah-tanggal" class="tambah"><i class="fi-plus"></i></a>
+                            <a id="kurang-tanggal" class="kurang"><i class="fi-minus"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            </div>
+            <p><i>Apabila anda sudah yakin silahkan pilih "Ajukan Lembur", jika tidak yakin anda bisa pilih "Simpan Sebagai Draft".</i></p>
+            <button class="custom-close-modal button radius tiny" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="ajukan" style="float: right; margin-left: 2px;">Ajukan Lembur</button>
+            <input name="ajukan" type="hidden">
+            <input name="submit-ajukan" type="hidden">
+            <button class="button radius tiny draft" type="submit" style="float: right;">Simpan Sebagai Draft</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up lihat lembur-->
+<div id="lihat-lembur" class="reveal-modal medium" data-reveal>
+    <form id="form-lihat-lembur" class="forml">
+        {% csrf_token %}
+        <input name="lembur" type="hidden">
+        <fieldset>
+            <legend>Detail Pengajuan Lembur</legend>
+            <span data-tooltip aria-haspopup="true" class="has-tip" title="Hapus" style="float: right;">
+                <a data-reveal-id="hapus-lembur"><i class="fi-trash size-24"></i></a>
+            </span>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Nama</label>
+                        <input class="auto-pegawai" type="text" required>
+                        <input name="pegawai" type="hidden">
+                    </td>
+                    <td>
+                        <label>Hari, Tanggal</label>
+                        <input name="tanggal" type="date" required>
+                        <input name="jenis" type="checkbox"> Akhir Pekan / Hari Libur
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Deskripsi Pekerjaan</label>
+                        <textarea name="deskripsi" rows="5" required></textarea>
+                    </td>
+                    <td>
+                        <label>Waktu Kerja</label>
+                        Mulai <input name="mulai" type="time" required>
+                        Selesai <input name="selesai" type="time" required>
+                    </td>
+                </tr>
+            </table>
+            <p><i>Apabila anda sudah yakin silahkan pilih "Ajukan Lembur", jika tidak yakin anda bisa pilih "Simpan Sebagai Draft".</i></p>
+            <button class="custom-close-modal button radius tiny batal" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="lihat" style="float: right; margin-left: 2px;">Ajukan Lembur</button>
+            <input name="ajukan" type="hidden">
+            <input name="submit-ajukan" type="hidden">
+            <button class="button radius tiny draft" type="submit" style="float: right;">Simpan Sebagai Draft</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p>
+        <h5>Apakah anda yakin untuk mengajukan lembur ini?</h5>
+        <br><i style="font-size: small">Bila ya, maka lembur ini akan di proses dan dikirim kepada SDM unit untuk proses pembayaran.</i>
+    </p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Hapus-->
+<div id="hapus-lembur" class="reveal-modal small" data-reveal>
+    <p>
+        <h5>Apakah anda yakin untuk menghapus lembur ini?</h5>
+    </p>
+    <button class="custom-close-hapus-modal button round tiny">Tidak</button>
+    <button class="custom-yes-hapus-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tablelemburunit = $('#lembur-unit').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tablelemburunit.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // initial state modal ajukan lembur
+    $('#ajukan-lembur').data('initial-state', $('#ajukan-lembur').html());
+
+    // initial state modal lihat lembur
+    $('#lihat-lembur').data('initial-state', $('#lihat-lembur').html());
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button tidak hapus
+    $(document).on('click', '.custom-close-hapus-modal', function(){
+        $('#hapus-lembur').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        var id = $(this).attr('id');
+        if (id=='submit-lihat'){
+            $('#form-lihat-lembur input[name=submit-ajukan]').val('');
+            $('#form-lihat-lembur').submit();
+        } else {
+            $('#form-lembur input[name=submit-ajukan]').val('');
+            $('#form-lembur').submit();
+        }
+    });
+
+    // button ya hapus
+    $(document).on('click', '.custom-yes-hapus-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        form = $('#form-lihat-lembur').serializeArray();
+        $.ajax({
+            type: "POST",
+            url: "../../hapuslembur/",
+            data: form,
+            dataType: "json",
+            success: function (response) {
+                alert("Data berhasil di delete");
+                $('.reveal-modal').foundation('reveal', 'close');
+                $('#lihat-lembur').html($('#lihat-lembur').data('initial-state'));
+                $('#lembur-unit #'+response.lembur).remove();
+                //location.reload();
+            },
+            error: function () {
+                alert("Data tidak berhasil di delete, silahkan coba lagi");
+                //location.reload();
+            }
+        });
+    });
+
+    // button ajukan
+    $(document).on('click', '.ajukan', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=submit-ajukan]').val('submitajukan');
+        var id = $(this).data('pop');
+        if (id=='lihat'){
+            $('.custom-yes-konfirmasi-modal').attr('id', 'submit-lihat');
+            $(targetForm).find('input[name=ajukan]').val('ajukanmanager');
+        } else {
+            $('.custom-yes-konfirmasi-modal').attr('id', 'submit-ajukan');
+            $(targetForm).find('input[name=ajukan]').val('ajukan');
+        }
+    });
+
+    // tambah
+    $(document).on("click", '.tambah', function(){
+        var btn = $(this).attr('id');
+        if (btn == 'tambah-pegawai'){
+            var tambah = '<div class="isi-pegawai">' +
+                            '<input class="auto-pegawai" type="text" required>' +
+                            '<input name="pegawai" type="hidden">' +
+                        '</div>';
+            $(this).closest('td').find('.isi-pegawai:last').after(tambah);
+        } else {
+            var tambah = '<div class="isi-tanggal" style="display:block; overflow:auto;">' +
+                            '<div style="width:45%; float:left;">' +
+                                '<label>Waktu Kerja</label>' +
+                                'Mulai <input name="mulai" type="time" required>' +
+                                'Selesai <input name="selesai" type="time" required>' +
+                            '</div>' +
+                            '<div style="width:45%; float:right;">' +
+                                '<label>Hari, Tanggal</label>' +
+                                '<input name="tanggal" type="date" required>' +
+                                '<input class="jenis-lembur" type="checkbox"> Akhir Pekan / Hari Libur' +
+                                '<input name="jenis" type="hidden">' +
+                            '</div>'+
+                        '</div>';
+            $(this).closest('td').find('.isi-tanggal:last').after(tambah);
+        }
+    });
+
+    // kurang
+    $(document).on("click", '.kurang', function(){
+        var btn = $(this).attr('id');
+        if (btn == 'kurang-pegawai'){
+            var rm = $(this).closest('td').find('.isi-pegawai:last');
+            if ($('.isi-pegawai').length == 1){
+                $(rm).find('input').val('');
+            } else {
+                $(rm).remove();
+            }
+        } else {
+            var rm = $(this).closest('td').find('.isi-tanggal:last');
+            if ($('.isi-tanggal').length == 1){
+                $(rm).find('input').val('');
+                $(rm).find('.jenis-lembur').prop('checked', false);
+            } else {
+                $(rm).remove();
+            }
+        }
+    });
+
+    // autocomplete isi pegawai
+    $(document).on("focus", ".auto-pegawai", function(e){
+        $(this).autocomplete({
+            source: "../../caripegawai/",
+            change: function(e, ui){
+                if (ui.item==null){
+                    $(this).val('');
+                }
+            },
+            focus: function(e, ui){
+                $(this).val(ui.item.label);
+                return false;
+            },
+            select: function(e, ui){
+                $(this).val(ui.item.label);
+                $(this).closest('div').find('input[name=pegawai]').val(ui.item.value);
+                return false;
+            }
+        });
+    });
+
+    // input jenis
+    $(document).on("change", ".jenis-lembur", function(){
+        if ($(this).is(':checked')){
+            $(this).closest('div').find('input[name=jenis]').val('1');
+        } else {
+            $(this).closest('div').find('input[name=jenis]').val('0');
+        }
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // submit form lembur
+    $(document).on("submit", "#form-lembur", function(e){
+        e.preventDefault();
+        if ($('#form-lembur input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else {
+        form = $('#form-lembur').serializeArray();
+        $(".flash").show();
+        $(".flash").fadeIn(400).html('<i>Pengajuan lembur sedang diproses ...</i>');
+        $.ajax({
+            type: "POST",
+            url: "../../ajukanlemburmanager/",
+            data: form,
+            dataType: "json",
+            success: function (response) {
+                $('#flash').hide();
+                alert("Data berhasil disimpan");
+                $('.reveal-modal').foundation('reveal', 'close');
+                $('#ajukan-lembur').html($('#ajukan-lembur').data('initial-state'));
+                $(document).foundation('reveal', 'reflow');
+                $.each(response, function(i, item){
+                    var lembur = '#'+item.lembur;
+                    var deskripsi = "<a class='data-lembur' data-reveal-id='lihat-lembur' data-id-lembur="+item.lembur+">"+item.deskripsi+"</a>";
+                    var tanggal = $.datepicker.formatDate('M. d, yy', new Date(item.tanggal));
+                    var waktu = item.mulai+" - "+item.selesai;
+                    var pegawai = item.pegawai;
+                    var status = item.status;
+                    var createdby = item.created;
+                    var newrow = $('#lembur-unit').DataTable().row.add([lembur, deskripsi, tanggal, waktu, pegawai, status, createdby]).draw().node();
+                    $(newrow).prop('id', item.lembur);
+                });
+                //location.reload();
+            },
+            error: function () {
+                alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                //location.reload();
+            }
+        });}
+    });
+
+    // open lihat lembur
+    $(document).on('click', 'tbody tr td .data-lembur', function(){
+        var id = $(this).data('idLembur');
+        $.ajax({
+            type: 'POST',
+            url: '../../lihatlembur/',
+            data: {lembur: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#lihat-lembur').html($('#lihat-lembur').data('initial-state'));
+                $(document).foundation('reveal', 'reflow');
+                $('#lihat-lembur input[name=lembur]').val(response.lembur);
+                $('#lihat-lembur .auto-pegawai').val(response.namapegawai);
+                $('#lihat-lembur input[name=pegawai').val(response.pegawai);
+                $('#lihat-lembur textarea[name=deskripsi').val(response.deskripsi);
+                $('#lihat-lembur input[name=tanggal').val(response.tanggal);
+                $('#lihat-lembur input[name=mulai]').val(response.mulai);
+                $('#lihat-lembur input[name=selesai').val(response.selesai);
+                $('#lihat-lembur input[name=jenis]').prop('checked', response.jenis);
+                if (response.status != 6 || response.createdby != response.request ){
+                    $('#lihat-lembur textarea, #lihat-lembur input').prop('disabled', true);
+                    $('#lihat-lembur .ajukan, #lihat-lembur .draft, #lihat-lembur .batal, #lihat-lembur p, #lihat-lembur span').remove();
+                }
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // submit form lihat lembur
+    $(document).on("submit", "#form-lihat-lembur", function(e){
+        e.preventDefault();
+        if ($('#form-lihat-lembur input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else {
+        form = $('#form-lihat-lembur').serializeArray();
+        $(".flash").show();
+        $(".flash").fadeIn(400).html('<p>Pengajuan lembur sedang diproses ...</p>');
+        $.ajax({
+            type: "POST",
+            url: "../../ubahlembur/",
+            data: form,
+            dataType: "json",
+            success: function (response) {
+                $('#flash').hide();
+                alert("Data berhasil disimpan");
+                $('.reveal-modal').foundation('reveal', 'close');
+                $('#lihat-lembur').html($('#lihat-lembur').data('initial-state'));
+                $(document).foundation('reveal', 'reflow');
+                var lembur = '#'+response.lembur;
+                var deskripsi = "<a class='data-lembur' data-reveal-id='lihat-lembur' data-id-lembur="+response.lembur+">"+response.deskripsi+"</a>";
+                var tanggal = $.datepicker.formatDate('M. d, yy', new Date(response.tanggal));
+                var waktu = response.mulai+" - "+response.selesai;
+                var pegawai = response.namapegawai;
+                var status = response.status;
+                var createdby = response.createdby;
+                var baris = $('#lembur-unit #'+response.lembur);
+                $('#lembur-unit').DataTable().row(baris).data([lembur, deskripsi, tanggal, waktu, pegawai, status, createdby]).draw();
+                //location.reload();
+            },
+            error: function () {
+                alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                //location.reload();
+            }
+        });}
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+    .ui-autocomplete-input {
+      border: none;
+      font-size: 14px;
+      width: 300px;
+      height: 24px;
+      margin-bottom: 5px;
+      padding-top: 2px;
+      border: 1px solid #DDD !important;
+      padding-top: 0px !important;
+      z-index: 1511;
+      position: relative;
+    }
+    .ui-menu .ui-menu-item a {
+      font-size: small;
+    }
+    .ui-autocomplete {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1510 !important;
+      float: left;
+      display: none;
+      min-width: 160px;
+      width: 160px;
+      padding: 4px 0;
+      margin: 2px 0 0 0;
+      list-style: none;
+      background-color: #ffffff;
+      border-color: #ccc;
+      border-color: rgba(0, 0, 0, 0.2);
+      border-style: solid;
+      border-width: 1px;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
+      *border-right-width: 2px;
+      *border-bottom-width: 2px;
+    }
+    .ui-menu-item > a.ui-corner-all {
+        display: block;
+        padding: 3px 15px;
+        clear: both;
+        font-weight: normal;
+        line-height: 18px;
+        color: #555555;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .ui-state-hover, .ui-state-active {
+          color: #ffffff;
+          text-decoration: none;
+          background-color: #0088cc;
+          border-radius: 0px;
+          -webkit-border-radius: 0px;
+          -moz-border-radius: 0px;
+          background-image: none;
+    }
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+</style>
+
+{% endblock %}

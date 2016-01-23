@@ -1,0 +1,747 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <ul class="tabs" data-tab role="tablist">
+          <li class="tab-title active" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1" style="padding: 10px;border-right: 1px solid black; font-size: small;">Pengajuan Lembur</a></li>
+          <li class="tab-title" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2" style="padding: 10px;border-right: 1px solid black; font-size: small;">Laporan Pembayaran Lembur</a></li>
+          <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3" style="padding: 10px;font-size: small;">Statistik Lembur</a></li>
+        </ul>
+        <div class="tabs-content">
+          <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+              <p>
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Pengajuan Baru</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Persetujuan Manajer/Wadek</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Verifikasi SDM</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Penyerahan Dokumen Pendukung</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Proses Pembayaran</a>
+              </p>
+            <a href="#" data-reveal-id="add-pengajuan" class="button round tiny">+ Pengajuan Baru</a>
+            <input type="search" placeholder="Search" style="float: right; width: 20%; height: 30px;">
+            <ul class="accordion" data-accordion>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel1a">
+                    <b>#1. Judul: Staf IT untuk Pengaturan Listrik Compfest</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i>Status: Pengajuan Baru</i>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Tanggal Lembur: 30 September 2015
+                </a>
+                <div id="panel1a" class="content">
+                  <a href="#" class="button round tiny" style="float: left;">Hapus Data Lembur</a>
+                  <a href="#" class="ubah button round tiny" style="float: right;">Ubah Data Lembur</a>
+                  <table class="table-ubah" style="width:100%;">
+                      <tr>
+                          <td style="width:25%;">Tanggal Diajukan</td>
+                          <td><input style="font-size: small" type="date" value="2015-10-28" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Deskripsi Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Staf IT ditugaskan untuk instalasi listrik Compfest di Balairung" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Pengajuan Baru" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Keterangan Status</td>
+                          <td><input style="font-size: small" type="text" value="Menunggu Persetujuan Manajer" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status terakhir diperbarui</td>
+                          <td><input type="datetime" value="2015-10-28 13:00" disabled style="font-size:small;width:30%; display: inline;"><div style="font-size:small; display: inline"> oleh </div><input type="text" value="[Nama Pegawai]" disabled style="font-size: small; width:20%; display:inline;"> <a href="#" data-reveal-id="sejarah-lembur" class="button round tiny" style="float: right;">Lihat detail perubahan status</a></td>
+                      </tr>
+                  </table>
+                  <p><b style="float: left;">Rekapitulasi Kehadiran dan Honor Lembur Pegawai</b><div style="font-size:small;float: right;"><a href="{% url 'lembur:kehadiran' %}">Lihat Detail</a>&nbsp;|&nbsp;<a href="{% url 'lembur:kehadiran' %}">Ubah</a></div></p>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th>Hari</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pegawai</th>
+                            <th>Jumlah Waktu Lembur</th>
+                            <th>Total Uang Lembur</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.00 jam</td>
+                            <td>Rp 81.000</td>
+                        </tr>
+                        <tr>
+                            <td>Selasa</td>
+                            <td>29 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.15 jam</td>
+                            <td>Rp 85.250</td>
+                        </tr>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai C</td>
+                            <td>3.30 jam</td>
+                            <td>Rp 89.500</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>Total</td>
+                            <td>9.45 jam</td>
+                            <td>Rp 255.750</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <b style="font-size: small;">Dokumen Pendukung</b>
+                    <div style="float: right;">
+                      <div class="switch round" style="float: right;">
+                        <span data-tooltip aria-haspopup="true" class="has-tip" title="Sudah diverifikasi!">
+                        <input type="checkbox" id="sudah-verifikasi1">
+                        <label for="sudah-verifikasi1">On</label>
+                        </span>
+                      </div>
+                      <a href="#" class="button round tiny" style="float: right;">Simpan</a>
+                    </div>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th><input type="checkbox" disabled></th>
+                            <th>Nama Dokumen</th>
+                            <th>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>FormLembur_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SPKL_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SuratTugas_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>DaftarHadir_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <input type="checkbox"> <i style="font-size: small">Dengan ini saya menyatakan bahwa semua dokumen sudah lengkap saya terima</i>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel2a">
+                    <b>#2. Judul: Staf Fasum untuk Mendukung Compfest</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i>Status: Pengajuan Baru</i>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Tanggal Lembur: 30 September 2015
+                </a>
+                <div id="panel2a" class="content">
+                  <a href="#" class="button round tiny" style="float: left;">Hapus Data Lembur</a>
+                  <a href="#" class="ubah button round tiny" style="float: right;">Ubah Data Lembur</a>
+                  <table class="table-ubah" style="width:100%;">
+                      <tr>
+                          <td style="width:25%;">Tanggal Diajukan</td>
+                          <td><input style="font-size: small" type="date" value="2015-10-28" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Deskripsi Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Staf IT ditugaskan untuk instalasi listrik Compfest di Balairung" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Pengajuan Baru" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Keterangan Status</td>
+                          <td><input style="font-size: small" type="text" value="Menunggu Persetujuan Manajer" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status terakhir diperbarui</td>
+                          <td><input type="datetime" value="2015-10-28 13.00" disabled style="font-size:small;width:30%; display: inline;"><div style="font-size:small; display: inline"> oleh </div><input type="text" value="[Nama Pegawai]" disabled style="font-size: small; width:20%; display:inline;"> <a href="#" data-reveal-id="sejarah-lembur" class="button round tiny" style="float: right;">Lihat detail perubahan status</a></td>
+                      </tr>
+                  </table>
+                  <p><b style="float: left;">Rekapitulasi Kehadiran dan Honor Lembur Pegawai</b><div style="font-size:small;float: right;"><a href="{% url 'lembur:kehadiran' %}">Lihat Detail</a>&nbsp;|&nbsp;<a href="{% url 'lembur:kehadiran' %}">Ubah</a></div></p>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th>Hari</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pegawai</th>
+                            <th>Jumlah Waktu Lembur</th>
+                            <th>Total Uang Lembur</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.00 jam</td>
+                            <td>Rp 81.000</td>
+                        </tr>
+                        <tr>
+                            <td>Selasa</td>
+                            <td>29 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.15 jam</td>
+                            <td>Rp 85.250</td>
+                        </tr>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai C</td>
+                            <td>3.30 jam</td>
+                            <td>Rp 89.500</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>Total</td>
+                            <td>9.45 jam</td>
+                            <td>Rp 255.750</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <b style="font-size: small;">Dokumen Pendukung</b>
+                    <div style="float: right;">
+                      <div class="switch round" style="float: right;">
+                        <span data-tooltip aria-haspopup="true" class="has-tip" title="Sudah diverifikasi!">
+                        <input type="checkbox" id="sudah-verifikasi2">
+                        <label for="sudah-verifikasi2">On</label>
+                        </span>
+                      </div>
+                      <a href="#" class="button round tiny" style="float: right;">Simpan</a>
+                    </div>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th><input type="checkbox" disabled></th>
+                            <th>Nama Dokumen</th>
+                            <th>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>FormLembur_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SPKL_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SuratTugas_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>DaftarHadir_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <input type="checkbox"> <i style="font-size: small">Dengan ini saya menyatakan bahwa semua dokumen sudah lengkap saya terima</i>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel3a">
+                    <b>#3. Judul: Satpam untuk Keamanan Compfest</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i>Status: Pengajuan Baru</i>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Tanggal Lembur: 30 September 2015
+                </a>
+                <div id="panel3a" class="content">
+                  <a href="#" class="button round tiny" style="float: left;">Hapus Data Lembur</a>
+                  <a href="#" class="ubah button round tiny" style="float: right;">Ubah Data Lembur</a>
+                  <table class="table-ubah" style="width:100%;">
+                      <tr>
+                          <td style="width:25%;">Tanggal Diajukan</td>
+                          <td><input style="font-size: small" type="date" value="2015-10-28" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Deskripsi Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Staf IT ditugaskan untuk instalasi listrik Compfest di Balairung" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status Lembur</td>
+                          <td><input style="font-size: small" type="text" value="Pengajuan Baru" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Keterangan Status</td>
+                          <td><input style="font-size: small" type="text" value="Menunggu Persetujuan Manajer" disabled></td>
+                      </tr>
+                      <tr>
+                          <td>Status terakhir diperbarui</td>
+                          <td><input type="datetime" value="2015-10-28 13:00" disabled style="font-size:small;width:30%; display: inline;"><div style="font-size:small; display: inline"> oleh </div><input type="text" value="[Nama Pegawai]" disabled style="font-size: small; width:20%; display:inline;"> <a href="#" data-reveal-id="sejarah-lembur" class="button round tiny" style="float: right;">Lihat detail perubahan status</a></td>
+                      </tr>
+                  </table>
+                  <p><b style="float: left;">Rekapitulasi Kehadiran dan Honor Lembur Pegawai</b><div style="font-size:small;float: right;"><a href="{% url 'lembur:kehadiran' %}">Lihat Detail</a>&nbsp;|&nbsp;<a href="{% url 'lembur:kehadiran' %}">Ubah</a></div></p>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th>Hari</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pegawai</th>
+                            <th>Jumlah Waktu Lembur</th>
+                            <th>Total Uang Lembur</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.00 jam</td>
+                            <td>Rp 81.000</td>
+                        </tr>
+                        <tr>
+                            <td>Selasa</td>
+                            <td>29 Sept 2015</td>
+                            <td>Pegawai A</td>
+                            <td>3.15 jam</td>
+                            <td>Rp 85.250</td>
+                        </tr>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28 Sept 2015</td>
+                            <td>Pegawai C</td>
+                            <td>3.30 jam</td>
+                            <td>Rp 89.500</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>Total</td>
+                            <td>9.45 jam</td>
+                            <td>Rp 255.750</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <b style="font-size: small;">Dokumen Pendukung</b>
+                    <div style="float: right;">
+                      <div class="switch round" style="float: right;">
+                        <span data-tooltip aria-haspopup="true" class="has-tip" title="Sudah diverifikasi!">
+                        <input type="checkbox" id="sudah-verifikasi3">
+                        <label for="sudah-verifikasi3">On</label>
+                        </span>
+                      </div>
+                      <a href="#" class="button round tiny" style="float: right;">Simpan</a>
+                    </div>
+                  <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <th><input type="checkbox" disabled></th>
+                            <th>Nama Dokumen</th>
+                            <th>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>FormLembur_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SPKL_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>SuratTugas_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>DaftarHadir_Judul.pdf</td>
+                            <td><a>Unduh Template</a>&nbsp;|&nbsp;<a>Unggah Berkas</a>&nbsp;|&nbsp;<a>Hapus</a></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                  <input type="checkbox"> <i style="font-size: small">Dengan ini saya menyatakan bahwa semua dokumen sudah lengkap saya terima</i>
+                </div>
+              </li>
+            </ul>
+          </section>
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+            <p><b>Laporan Pembayaran Lembur</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a>[Unduh Laporan(.xls)]</a></p>
+            <p>Berikut ini adalah data pembayaran lembur untuk periode pengajuan:</p>
+            <p>1 Agustus - 31 Agustus 2015 <a>[Ubah Periode]</a></p>
+            <p><b>Filter laporan per pegawai</b></p>
+            <p>Lihat Laporan Lembur untuk <select style="font-size:small; height: 35px;width:30%;"><option>Pegawai A</option><option>Pegawai B</option><option>Pegawai C</option><option>Pegawai D</option></select> <a class="button round tiny">+</a></p>
+            <p style="text-align: center"><b>Nama Pegawai: Pegawai A</b></p>
+            <table style="width:100%;">
+                      <thead>
+                        <tr>
+                            <td>Hari</td>
+                            <td>Tanggal</td>
+                            <td>Jam Masuk</td>
+                            <td>Jam Keluar</td>
+                            <td>Jml Waktu Hadir</td>
+                            <td>Jam Lembur</td>
+                            <td>Jml Waktu Lembur</td>
+                            <td>Ket.</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28/09/2015</td>
+                            <td>17:00:00</td>
+                            <td>20:00:00</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28/09/2015</td>
+                            <td>17:00:00</td>
+                            <td>20:00:00</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Senin</td>
+                            <td>28/09/2015</td>
+                            <td>17:00:00</td>
+                            <td>20:00:00</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                            <td>3:00:00</td>
+                            <td>-</td>
+                        </tr>
+                      </tbody>
+                  </table>
+            <p><b>Jumlah uang yang harus dibayarkan</b></p>
+            <table>
+                <tr>
+                    <td>1.</td>
+                    <td>Uang lembur</td>
+                    <td>9.00 x 17.000</td>
+                    <td>Rp 51.000</td>
+                </tr>
+                <tr>
+                    <td>2.</td>
+                    <td>Uang makan</td>
+                    <td>1 x 25.000</td>
+                    <td>Rp 25.000</td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td>Uang transport libur</td>
+                    <td>1 x 38.000</td>
+                    <td>Rp 38.000</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>JUMLAH</td>
+                    <td>Rp 114.000</td>
+                </tr>
+            </table>
+            <p style="text-align: center"><b>Total Uang Lembur yang harus dibayarkan untuk periode [1 Agustus 2015 - 31 Agustus 2015]: Rp 114.000</b></p>
+            <div style="float: right;">
+                <div class="switch round" style="float: right;">
+                    <span data-tooltip aria-haspopup="true" class="has-tip" title="Sudah diproses bayar!">
+                        <input type="checkbox" id="sudah-bayar">
+                        <label for="sudah-bayar">On</label>
+                    </span>
+                </div>
+                <a href="#" class="button round tiny" style="float: right;">Unduh Laporan dan Tanda Terima</a>
+            </div>
+          </section>
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-3">
+            <p><b>Statistik Lembur Semua Unit Kerja</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a>[Unduh Laporan(.xls)]</a></p>
+            <p>Berikut ini adalah grafik statistik lembur pegawai untuk periode:</p>
+            <p>1 Agustus - 31 Agustus 2015 <a>[Ubah Periode]</a></p>
+            <div id="chart-unit-all"></div><br><br><br>
+            <p><b>Statistik Lembur Unit Kerja [Nama Unit Kerja]</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="button round tiny">Ganti Unit Kerja</a></p>
+            <div id="manunit-chart"></div>
+            <p><b>Gambaran Umum Lembur untuk Tendik: [Nama Pegawai]</b></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hari/Tanggal</th>
+                        <th>Judul</th>
+                        <th>Jumlah Jam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr<>
+                        <td>Senin/28 September 2015</td>
+                        <td>Support IT untuk kegiatan Compfest</td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr<>
+                        <td>Selasa/29 September 2015</td>
+                        <td>Support IT untuk kegiatan Instalasi Listrik</td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr<>
+                        <td>Rabu/30 September 2015</td>
+                        <td>Support IT untuk kegiatan Persiapan Kelas</td>
+                        <td>3 jam</td>
+                    </tr>
+                </tbody>
+            </table>
+          </section>
+        </div>
+
+    </div>
+
+</div>
+
+    <div id="add-pengajuan" class="reveal-modal " data-reveal>
+            <form id="add-new-user" action="{% url 'usermgmt:createUser' %}" method="post">
+                {% csrf_token %}
+                <fieldset style="font-size: small;">
+                    <legend style="font-size: medium">Formulir Pengajuan Lembur</legend>
+                    <p><i>Lengkapi formulir pengajuan lembur di bawah ini. Semua field wajib diisi.</i></p>
+                    <table style="width: 100%" id="table-pengajuan">
+                        <tr>
+                            <td>Judul</td>
+                            <td><input type="text" placeholder="Tulis judul lembur" style="font-size: small"></td>
+                        </tr>
+                        <tr class="tanggal">
+                            <td class="tgl-label" style="width: 20%">Tanggal/Waktu Lembur</td>
+                            <td><input type="date" style="font-size:small;width: 25%; display: inline;"> <input type="time" style="font-size:small;width: 17%; display: inline;"> - <input type="time" style="font-size:small;width: 17%; display:inline;">&nbsp;<input type="checkbox" style="display:inline;">&nbsp;akhir pekan / hari libur&nbsp;<div class="add-holder1" style="display:inline;"><a id="tambah-tgl" class="button round tiny" style="display: inline;"><b>+</b></a></div><div class="rm-holder1" style="display: inline;"></div> </td>
+                        </tr>
+                        <tr>
+                            <td>Tempat</td>
+                            <td><input type="text" placeholder="Tulis tempat lembur" style="font-size: small"></td>
+                        </tr>
+                        <tr class="pegawai">
+                            <td class="pegawai-label">Pegawai Lembur</td>
+                            <td><input type="text" placeholder="Cari nama pegawai" style="font-size:small;width:70%; display:inline;"><div class="add-holder2" style="display:inline;"><a id="tambah-pegawai" class="button round tiny" style="display:inline;">+</a></div><div class="rm-holder2" style="display: inline;"></div> </td>
+                        </tr>
+                        <tr>
+                            <td>Keterangan</td>
+                            <td><textarea style="font-size: small" placeholder="Tulis deskripsi beban kerja dan jenis pekerjaan" rows="5" cols="1"></textarea></td>
+                        </tr>
+                    </table>
+                    <input type="checkbox"> Saya menyetujui bahwa data yang dimasukkan sudah benar adanya sesuai dengan penugasan lembur yang diberikan oleh Pimpinan.
+                </fieldset>
+                <a href="#" class="custom-close-modal button radius tiny">Ajukan Lembur</a>
+                <a href="#" class="custom-close-modal button radius tiny">Batal</a>
+                <input type="submit" value="Submit" style="visibility: hidden" />
+            </form>
+            <a class="close-reveal-modal">&#215;</a>
+        </div>
+
+    <div id="sejarah-lembur" class="reveal-modal " data-reveal>
+                <fieldset>
+                    <legend style="font-size: medium">Sejarah Perubahan Status Pengajuan Lembur</legend>
+                    <table style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Status Pengajuan</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td>28 September 2015</td>
+                                <td>10.00 AM</td>
+                                <td>Pengajuan Baru</td>
+                                <td>Belum disetujui Manajer</td>
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td>29 September 2015</td>
+                                <td>12.00 AM</td>
+                                <td>Pengajuan Baru</td>
+                                <td>Disetujui Manajer</td>
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td>29 September 2015</td>
+                                <td>12.00 AM</td>
+                                <td>Kelengkapan Dokumen Pendukung</td>
+                                <td>Dokumen belum diunggah</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </fieldset>
+            <a class="close-reveal-modal">&#215;</a>
+        </div>
+    <div id="sudah-verifikasi" class="reveal-modal " data-reveal>
+        <h6><b>Konfirmasi Proses Bayar</b></h6>
+        <p>Dengan ini saya mengkonfirmasi bahwa pengajuan lembur sudah diverifikasi dan akan diproses pembayarannya ke bagian Keuangan.</p>
+        <a href="#" class="custom-close-modal button radius tiny">Setujui</a>
+        <a href="#" class="custom-close-modal button radius tiny">Batal</a>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+        $('#chart-unit-all').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Total Lembur (jam)',
+                style: {
+                    fontSize: 'small'
+                }
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: [
+                    'Keuangan',
+                    'ITF',
+                    'Akademik',
+                    'Riset',
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Jam'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Jam Lembur',
+                data: [20, 35, 40, 15]
+
+            }]
+        });
+        $('#manunit-chart').highcharts({
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Grafik Visualisasi Lembur Pegawai di Unit Kerja [Nama Unit Kerja]',
+                style: {
+                    fontSize: 'small'
+                }
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Pegawai A', 'Pegawai B', 'Pegawai C', 'Pegawai D']
+            },
+            yAxis: {
+                title: {
+                    text: 'Jam Kerja'
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                    enableMouseTracking: false
+                }
+            },
+            series: [{
+                name: 'Total Jam Lembur',
+                data: [10, 20, 10, 40]
+            },]
+        });
+    });
+    $('a.custom-close-modal').click(function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+     // add new row in form
+      $(document).on("click", "#tambah-tgl",function()
+      {
+        var $tr = $(this).closest($("tr")).clone(true);
+        $(this).remove();
+        $("#table-pengajuan").find(".tanggal:last").after($tr);
+        $(".tgl-label:last").html("");
+        $(".rm-holder1:last").html("<a class='remove1 button round tiny' style='background-color:red;'>X</a>");
+        return false;
+      });
+      $(document).on("click", "#tambah-pegawai",function()
+      {
+        var $tr = $(this).closest($("tr")).clone(true);
+        $(this).remove();
+        $("#table-pengajuan").find(".pegawai:last").after($tr);
+        $(".pegawai-label:last").html("");
+        $(".rm-holder2:last").html("<a class='remove2 button round tiny' style='background-color:red;'>X</a>");
+        return false;
+      });
+      $(document).on("click", ".remove1",function(){
+          $add = $(this).closest("tr").find("#tambah-tgl");
+          $(this).closest("tr").remove();
+          if($(".remove1").length == 0 || $add){
+            $(".add-holder1:last").html("<a id='tambah-tgl' class='button round tiny' style='display: inline;'><b>+</b></a>");
+          }
+      });
+      $(document).on("click", ".remove2",function(){
+          $add = $(this).closest("tr").find("#tambah-pegawai");
+          $(this).closest("tr").remove();
+          if($(".remove2").length == 0 || $add){
+            $(".add-holder2:last").html("<a id='tambah-pegawai' class='button round tiny' style='display: inline;'><b>+</b></a>");
+          }
+      });
+      $(document).on("click", ".ubah", function(){
+          $(this).closest("div").find(".table-ubah input").prop("disabled", false);
+          $(this).text("Simpan Data Lembur");
+          $(this).attr("class", "simpan button round tiny");
+      });
+      $(document).on("click", ".simpan", function(){
+          $(this).closest("div").find(".table-ubah input").prop("disabled", true);
+          $(this).text("Ubah Data Lembur");
+          $(this).attr("class", "ubah button round tiny")
+      });
+</script>
+<style>
+    table thead tr th, table tbody tr td, table {
+        font-size: small;
+    }
+    p {
+        font-size: small;
+    }
+</style>
+
+{% endblock %}

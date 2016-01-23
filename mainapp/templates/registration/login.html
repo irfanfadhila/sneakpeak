@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="row" style="width: 50%; margin-top: 5%;">
+        <div class="large-6 large-centered text-center columns">
+            <div class="signup-panel">
+                <p class="welcome"> Selamat Datang di Sistem Informasi SDM</p>
+
+                <a class="radius button" href="{% url 'mainapp:django_cas_ng.views.login' %}">Login</a>
+
+            </div>
+        </div>
+    </div>
+
+    {% include "scriptRef.html" %}
+
+    <script>
+        $(document).foundation();
+    </script>
+
+{% endblock %}

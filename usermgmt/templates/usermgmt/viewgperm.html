@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <nav class="breadcrumbs" role="menubar" aria-label="breadcrumbs" style="margin-bottom: 2%;">
+            <li {% if cursor == 'home' %} class="active" {% endif %} role="menuitem"><a href="{% url 'adminsdm:index' %}">Home</a></li>
+            <li {% if cursor == 'usrmgmt' %} class="active" {% endif %} role="menuitem"><a href="{% url 'usermgmt:index' %}">User Management</a></li>
+            <li {% if cursor == 'usrmgmt' %} class="current" {% endif %} role="menuitem"><a href="#">Group Permission</a></li>
+            <li {% if cursor == 'usrmgmt' %} class="current" {% endif %} role="menuitem"><a href="#">Group Permission Detail</a></li>
+        </nav>
+
+        <h3>Group Permission for {{ gperm.group.name }}</h3>
+
+        <fieldset>
+            <table>
+                <tr>
+                    <td><label>Group Name</label></td>
+                    <td style="width: 85%"><input readonly type="text" value="{{ gperm.group.name }}"></td>
+                </tr>
+                <tr>
+                    <td><label>Permission Name</label></td>
+                    <td><input readonly type="text" value="{{ gperm.permission.name }}"></td>
+                </tr>
+            </table>
+            <a href="#" data-reveal-id="edit-gperm" class="radius button">Edit</a>
+        </fieldset>
+
+    </div>
+
+</div>
+
+    <div id="edit-gperm" class="reveal-modal" data-reveal>
+        <h3>Edit Permission</h3>
+        <form id="form-edit-gperm" action="{% url 'usermgmt:editGroupPerm' id=gperm.id %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                {{ forms }}
+            </fieldset>
+            <a href="#" onclick="document.forms['form-edit-gperm'].submit();" class="button radius">Submit</a>
+            <a href="#" class="custom-close-modal button radius">Cancel</a>
+            <input type="submit" value="Submit" style="visibility: hidden" />
+        </form>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $('a.custom-close-modal').click(function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+</script>
+
+{% endblock %}

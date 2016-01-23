@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Daftar Lembur yang Menunggu Proses Pembayaran, Harap Dicetak</b></h6>
+        <ul class="tabs" data-tab role="tablist" id="tabmenu">
+            <li class="tab-title active small" role="presentation">
+                <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1" style="padding:10px; border-right: 1px solid black; font-size: small;">
+                    Hari Kerja &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="alert round label" style="float: right;">{{ harikerja.count }}</span>
+                </a>
+            </li>
+            <li class="tab-title small" role="presentation">
+                <a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2" style="padding:10px; font-size: small;">
+                    Hari Libur &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="alert round label" style="float: right;">{{ harilibur.count }}</span>
+                </a>
+            </li>
+        </ul>
+        <div class="tabs-content">
+            <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+                <table id="hari-kerja" class="display table-data" style="table-layout: fixed">
+                    <thead>
+                        <tr>
+                            <th style="width:5%;">ID</th>
+                            <th>Deskripsi Pekerjaan</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Jenis Lembur</th>
+                            <th>Waktu Kerja</th>
+                            <th>Pegawai</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                    <tfoot style="display: table-header-group">
+                        <tr>
+                            <th>ID</th>
+                            <th>Deskripsi Pekerjaan</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Jenis Lembur</th>
+                            <th>Waktu Kerja</th>
+                            <th>Pegawai</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                    {% if harikerja %}
+                        {% for hk in harikerja %}
+                            <tr id="{{ hk.id }}">
+                                <td>#{{ hk.id }}</td>
+                                <td><a class="data-lembur" href="{% url 'lembur:formharikerja' id=hk.id %}">{{ hk.deskripsi_pekerjaan }}</a></td>
+                                <td>{{ hk.tanggal }}</td>
+                                <td>{{ hk.jenis_lembur.jenis_lembur }}</td>
+                                <td>{{ hk.waktu_mulai|time:'H:i' }} - {{ hk.waktu_selesai|time:'H:i' }}</td>
+                                <td>{{ hk.pegawai.user.first_name }}</td>
+                                <td>{{ hk.status.status }}</td>
+                                <td>{{ hk.created_by.user.first_name }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <p>Tidak ada lembur hari kerja yang dapat di proses.</p>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </section>
+            <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+                <table id="hari-libur" class="display table-data" style="table-layout: fixed">
+                    <thead>
+                        <tr>
+                            <th style="width:5%;">ID</th>
+                            <th>Deskripsi Pekerjaan</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Jenis Lembur</th>
+                            <th>Waktu Kerja</th>
+                            <th>Pegawai</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                    <tfoot style="display: table-header-group">
+                        <tr>
+                            <th>ID</th>
+                            <th>Deskripsi Pekerjaan</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Jenis Lembur</th>
+                            <th>Waktu Kerja</th>
+                            <th>Pegawai</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                    {% if harilibur %}
+                        {% for hl in harilibur %}
+                            <tr id="{{ hl.id }}">
+                                <td>#{{ hl.id }}</td>
+                                <td><a class="data-lembur" href="{% url 'lembur:formharilibur' id=hl.id %}">{{ hl.deskripsi_pekerjaan }}</a></td>
+                                <td>{{ hl.tanggal }}</td>
+                                <td>{{ hl.jenis_lembur.jenis_lembur }}</td>
+                                <td>{{ hl.waktu_mulai|time:'H:i' }} - {{ hl.waktu_selesai|time:'H:i' }}</td>
+                                <td>{{ hl.pegawai.user.first_name }}</td>
+                                <td>{{ hl.status.status }}</td>
+                                <td>{{ hl.created_by.user.first_name }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <p>Tidak ada lembur hari libur yang dapat di proses.</p>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tableharikerja = $('#hari-kerja').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+        var tableharilibur = $('#hari-libur').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tableharikerja.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+        tableharilibur.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form, .accordion .accordion-navigation a {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

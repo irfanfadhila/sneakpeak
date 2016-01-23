@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6><b>Master Data Permission Lembur</b></h6>
+        <a id="pop-create" data-reveal-id="pop-permission" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Create Permission Lembur</a>
+
+        <table id="md-permission" class="display table-data" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width:5%;">ID</th>
+                    <th>Permission Lembur</th>
+                </tr>
+            </thead>
+            <tfoot style="display: table-header-group">
+                <tr>
+                    <th>ID</th>
+                    <th>Permission Lembur</th>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% if mdpermission %}
+            {% for p in mdpermission %}
+                <tr id="{{ p.id }}">
+                    <td>#{{ p.id }}</td>
+                    <td><a class="data-permission" data-reveal-id="pop-permission" data-id-permission="{{ p.id }}">{{ p.permission }}</a></td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <p>Data permission lembur kosong</p>
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div id="pop-permission" class="reveal-modal medium" data-reveal>
+    <form id="form-permission" class="forml">
+        <input name="idpermission" type="hidden">
+        <input name="del" type="hidden">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Master Data Permission Lembur</legend>
+            <div id="edit-del-holder" style="float: right; display: inline;"></div>
+            <div class="flash" style="float: right; display: inline;"></div>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <label>Permission Lembur</label>
+                    </td>
+                    <td>
+                        <input name="permission" type="text">
+                    </td>
+                </tr>
+            </table>
+            <input name="submit-ajukan" type="hidden">
+            <button class="custom-close-modal button radius tiny" type="button" style="float: left;">Batal</button>
+            <button class="button radius tiny ajukan" type="submit" data-pop="ajukan" style="float: right; margin-left: 2px;">Submit</button>
+        </fieldset>
+    </form>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+<!--Pop Up Konfirmasi-->
+<div id="konfirmasi" class="reveal-modal small" data-reveal>
+    <fieldset>
+    <p>
+        <h5 id="pesan-konfirmasi">Apakah anda yakin untuk membuat permission lembur baru?</h5>
+    </p>
+    <button class="custom-close-konfirmasi-modal button round tiny">Tidak</button>
+    <button class="custom-yes-konfirmasi-modal button round tiny">Ya</button>
+    </fieldset>
+    <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px; font-size:small;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID") {$(this).html( '' )}
+        } );
+
+        // DataTable
+        var tablelembur = $('#md-permission').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+
+        // Apply the search
+        tablelembur.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+    });
+
+    // initial state modal ajukan permission
+    $('#pop-permission').data('initial-state', $('#pop-permission').html());
+    // initial state konfirmasi
+    $('#konfirmasi').data('initial-state', $('#konfirmasi').html());
+
+    // button pop create
+    $(document).on('click', '#pop-create', function(){
+        $('#pop-permission').html($('#pop-permission').data('initial-state'));
+    });
+
+    // button batal
+    $(document).on("click", '.custom-close-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+    });
+
+    // button ajukan
+    $(document).on('click', '.ajukan', function(){
+        var targetForm = $(this).closest('form');
+        $(targetForm).find('input[name=submit-ajukan]').val('submitajukan');
+    });
+
+    // prevent submit from enter
+    $(document).on("keyup keypress", ".forml", function(e){
+        var code = e.keyCode || e.which;
+        if (code == 13){
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // button tidak konfirmasi
+    $(document).on('click', '.custom-close-konfirmasi-modal', function(){
+        $('#konfirmasi').foundation('reveal', 'close');
+    });
+
+    // button ya konfirmasi
+    $(document).on('click', '.custom-yes-konfirmasi-modal', function(){
+        $('.reveal-modal').foundation('reveal', 'close');
+        $('.reveal-modal-bg').css({display: 'none'});
+        $('#form-permission input[name=submit-ajukan]').val('');
+        $('#form-permission').submit();
+    });
+
+    // submit form permission
+    $(document).on("submit", "#form-permission", function(e){
+        e.preventDefault();
+        if ($('#form-permission input[name=submit-ajukan]').val() == 'submitajukan') {
+            $('#konfirmasi').html($('#konfirmasi').data('initial-state'));
+            $('#konfirmasi').foundation('reveal', 'open');
+            return false;
+        } else if ($('#form-permission input[name=del]').val() == 'delete') {
+            form = $('#form-permission').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Data permission sedang di delete ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mddeletepermissionlembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil di delete");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-permission').html($('#pop-permission').data('initial-state'));
+                    $('#md-permission #'+response.permission).remove();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil di delete, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else if ($('#form-permission input[name=idpermission]').val() != '') {
+            form = $('#form-permission').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Perubahan permission lembur sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdeditpermissionlembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-permission').html($('#pop-permission').data('initial-state'));
+                    var permission = '#'+response.permission;
+                    var permissionlembur = "<a class='data-permission' data-reveal-id='pop-permission' data-id-permission="+response.permission+">"+response.permissionlembur+"</a>";
+                    var baris = $('#md-permission #'+response.permission);
+                    $('#md-permission').DataTable().row(baris).data([permission, permissionlembur]).draw();
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        } else {
+            form = $('#form-permission').serializeArray();
+            $(".flash").show();
+            $(".flash").fadeIn(400).html('<p>Pembuatan permission lembur sedang diproses ...</p>');
+            $.ajax({
+                type: "POST",
+                url: "../../mdcreatepermissionlembur/",
+                data: form,
+                dataType: "json",
+                success: function (response) {
+                    $('#flash').hide();
+                    alert("Data berhasil disimpan");
+                    $('.reveal-modal').foundation('reveal', 'close');
+                    $('#pop-permission').html($('#pop-permission').data('initial-state'));
+                    var permission = '#'+response.permission;
+                    var permissionlembur = "<a class='data-permission' data-reveal-id='pop-permission' data-id-permission="+response.permission+">"+response.permissionlembur+"</a>";
+                    var newrow = $('#md-permission').DataTable().row.add([permission, permissionlembur]).draw().node();
+                    $(newrow).prop('id', response.permission);
+                    //location.reload();
+                },
+                error: function () {
+                    alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                    //location.reload();
+                }
+            });
+        }
+    });
+
+    // open lihat permission lembur
+    $(document).on('click', 'tbody tr td .data-permission', function(){
+        var id = $(this).data('idPermission');
+        var isieditdel = '<a id="edit-permission"><i class="fi-pencil size-24"></i> Edit </a> &nbsp;&nbsp;&nbsp;' +
+                '<a id="delete-permission"><i class="fi-trash size-24"></i>  Delete </a>';
+        $.ajax({
+            type: 'POST',
+            url: '../../mdviewpermissionlembur/',
+            data: {permission: id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+            dataType: 'json',
+            success: function(response){
+                $('#pop-permission').html($('#pop-permission').data('initial-state'));
+                $('#pop-permission input[name=idpermission]').val(response.permission);
+                $('#pop-permission input[name=permission]').val(response.permissionlembur);
+                $('#pop-permission input[name=permission]').prop('readonly', true);
+                $('#pop-permission #edit-del-holder').html(isieditdel);
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+
+    // tombol edit dan save
+    $(document).on("click", "#edit-permission", function(){
+        $(this).closest("fieldset").find("table input[name=permission]").prop("readonly", false);
+        $(this).html('<i class="fi-save size-24"></i> Save ');
+        $(this).attr("id", "save-permission");
+    });
+    $(document).on("click", "#save-permission", function(){
+        $(this).closest("fieldset").find("table input[name=permission]").prop("readonly", true);
+        $(this).html('<i class="fi-pencil size-24"></i> Edit ');
+        $(this).attr("id", "edit-permission");
+    });
+
+    // tombol delete permission
+    $(document).on("click", "#delete-permission", function(){
+        $('#form-permission input[name=del]').val('delete');
+        $('#konfirmasi #pesan-konfirmasi').html('Apakah anda yakin ingin menghapus permission ini?');
+        $('#konfirmasi').foundation('reveal', 'open');
+    });
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

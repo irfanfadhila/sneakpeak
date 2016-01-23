@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <form id="form-login" action="{% url 'mainapp:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row collapse">
+                        <div class="small-2  columns">
+                            <span class="prefix"><i class="fi-torso-female"></i></span>
+                        </div>
+                        <div class="small-10  columns">
+                            <input id="id_username" type="text" placeholder="username" name="username">
+                        </div>
+                    </div>
+                    <div class="row collapse">
+                        <div class="small-2 columns">
+                            <span class="prefix"><i class="fi-lock"></i></span>
+                        </div>
+                        <div class="small-10 columns">
+                            <input id="id_password" type="password" placeholder="password" name="password">
+                        </div>
+                    </div>
+                    <a href="#" onclick="document.forms['form-login'].submit();" class="button">Sign In</a>
+                    <input type="submit" value="login" style="visibility: hidden" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                </form>
+
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+    $(document).foundation();
+</script>
+
+{% endblock %}

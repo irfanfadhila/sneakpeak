@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="small-5 small-centered columns">
+
+    {% if pegawai %}
+        {% if pegawai.permission.id == 2 %}
+            <a href="{% url 'lembur:lembur' ket='piclembur' %}" class="radius button split small" style="width: 100%">PIC Lembur</a>
+        {% elif pegawai.permission.id == 3 %}
+            <a href="{% url 'lembur:lembur' ket='manager' %}" class="radius button split small" style="width: 100%">Manager</a>
+        {% elif pegawai.permission.id == 1 %}
+            <a href="{% url 'lembur:lembur' ket='master' %}" class="radius button split small" style="width: 100%">Master Data</a>
+            <a href="{% url 'lembur:lembur' ket='piclembur' %}" class="radius button split small" style="width: 100%">PIC Lembur</a>
+            <a href="{% url 'lembur:lembur' ket='manager' %}" class="radius button split small" style="width: 100%">Manager</a>
+        {% endif %}
+        <a href="{% url 'lembur:lembur' ket='pegawai' %}" class="radius button split small" style="width: 100%">Pegawai</a>
+    {% else %}
+        <p>Anda Tidak memiliki akses ke halaman ini</p>
+    {% endif %}
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+</script>
+
+{% endblock %}

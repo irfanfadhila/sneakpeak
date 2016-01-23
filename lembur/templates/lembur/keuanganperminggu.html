@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6>Silahkan pilih periode laporan keuangan:</h6>
+
+        <div style="display:block;overflow:auto;">
+            <form id="form-perminggu">
+                {% csrf_token %}
+                <div style="display:inline;float:left;">
+                    <label>Pilih pegawai:</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <input class="auto-pegawai" type="text" required>
+                    <input name="pegawai" type="hidden">
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>Pilih Periode:</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;" id="brp-minggu">
+                    <input type="hidden" name="brpminggu" value="0">
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="width:200px;display:inline;float:left;">
+                    <select id="select-minggu">
+                        <option value="1">Minggu Ini</option>
+                        <option value="2">Minggu Sebelumnya</option>
+                    </select>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <button type="submit" class="button radius small">Cari!</button>
+                </div>
+            </form>
+        </div>
+
+        <table id="laporan-perminggu" class="display table-data" style="table-layout:fixed; width:100%;">
+            <caption>
+                Laporan Lembur Pegawai Fasilkom UI <br>
+                <div id="caption-pegawai"></div> <br>
+                <div id="periode-mulai" style="display: inline;"></div> &nbsp; s.d &nbsp;
+                <div id="periode-selesai" style="display:inline;"></div>
+            </caption>
+            <thead>
+                <tr>
+                    <th>HARI</th>
+                    <th>TANGGAL</th>
+                    <th>JAM MASUK</th>
+                    <th>JAM KELUAR</th>
+                    <th>JML WKT HADIR</th>
+                    <th>JML WKT LEMBUR</th>
+                    <th>JML WKT +/-</th>
+                    <th>KET.</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th colspan="3">JUMLAH WAKTU:</th>
+                    <th id="hadirtotal"></th>
+                    <th id="lemburtotal"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th colspan="3">Jumlah Waktu (dalam pecahan desimal)</th>
+                    <th id="hadirtotaldec"></th>
+                    <th id="lemburtotaldec"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr class="data-periode">
+                    <td class="hari"></td>
+                    <td class="tanggal"></td>
+                    <td class="masuk"></td>
+                    <td class="keluar"></td>
+                    <td class="wkthadir"></td>
+                    <td class="wktlembur"></td>
+                    <td class="jmlwaktu"></td>
+                    <td class="ket"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table id="harus-dibayarkan" class="display table-data" style="table-layout:fixed; width:100%;">
+            <caption>Jumlah Uang yang Harus Dibayarkan</caption>
+            <tr>
+                <td style="width: 5%;">1.</td>
+                <td>Uang Lembur</td>
+                <td style="width: 3%;">:</td>
+                <td id="xuanglembur">....</td>
+                <td style="width: 3%;">x</td>
+                <td id="yuanglembur">....</td>
+                <td id="zuanglembur">....</td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>Uang Makan</td>
+                <td>:</td>
+                <td id="xuangmakan">....</td>
+                <td>x</td>
+                <td id="yuangmakan">....</td>
+                <td id="zuangmakan">....</td>
+            </tr>
+            <tr>
+                <td>3.</td>
+                <td>Uang Transport Libur</td>
+                <td>:</td>
+                <td id="xuangtransport">....</td>
+                <td>x</td>
+                <td id="yuangtransport">....</td>
+                <td id="zuangtransport">....</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Jumlah</td>
+                <td id="totaluang">....</td>
+            </tr>
+        </table>
+
+        <div style="float:right; margin-top:5px;">
+            <form id="genreport" method="POST" action="{% url 'lembur:pdflaporanperminggu' %}">
+                {% csrf_token %}
+                <input type="hidden" name="r_pegawai">
+                <input type="hidden" name="r_brpminggu">
+                <a class="button radius small" type="submit" onclick="document.forms['genreport'].submit();">Generate Report</a>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+
+    // initial state table laporan periode
+    $('#laporan-perminggu').data('initial-state', $('#laporan-perminggu').html());
+
+    // select minggu
+    $(document).on('change', '#select-minggu', function(e){
+        var selectopt = $('option:selected', this);
+        if (selectopt.val() == 2){
+            $('#brp-minggu').html('<input type="text" name="brpminggu">');
+        } else {
+            $('#brp-minggu').html('<input type="hidden" name="brpminggu" value="0">');
+        }
+        return false;
+    });
+
+    // autocomplete isi pegawai
+    $(document).on("focus", ".auto-pegawai", function(e){
+        $(this).autocomplete({
+            source: "../../caripegawai/",
+            change: function(e, ui){
+                if (ui.item==null){
+                    $(this).val('');
+                }
+            },
+            focus: function(e, ui){
+                $(this).val(ui.item.label);
+                return false;
+            },
+            select: function(e, ui){
+                $(this).val(ui.item.label);
+                $(this).closest('div').find('input[name=pegawai]').val(ui.item.value);
+                return false;
+            }
+        });
+    });
+
+    // cari data pegawai per minggu
+    $(document).on("submit", "#form-perminggu", function(e){
+        e.preventDefault();
+        var form = $('#form-perminggu').serializeArray();
+        $.ajax({
+            type: 'POST',
+            url: '../../cariperminggu/',
+            data: form,
+            dataType: 'json',
+            success: function(response){
+                alert('yeah');
+                $('#laporan-perminggu').html($('#laporan-perminggu').data('initial-state'));
+                $('#genreport input[name=r_pegawai]').val(form[1].value);
+                $('#genreport input[name=r_brpminggu]').val(form[2].value);
+                $.each(response, function(i, item){
+                    var counter = i;
+                    if (counter == 1) {
+                        $('#caption-pegawai').html(item.pegawai);
+                        $('#periode-mulai').html(item.tanggal);
+                    }
+                    $('.hari:last').html(item.hari);
+                    $('.tanggal:last').html(item.tanggal);
+                    $('.masuk:last').html(item.masuk);
+                    $('.keluar:last').html(item.keluar);
+                    $('.wkthadir:last').html(item.wkthadir);
+                    $('.wktlembur:last').html(item.wktlembur);
+                    $('.jmlwaktu:last').html(item.jmlwaktu);
+                    $('.ket:last').html(item.ket);
+                    if (counter < (response.length - 1)) {
+                        var newtr = '<tr class="data-periode">' +
+                                        '<td class="hari"></td>' +
+                                        '<td class="tanggal"></td>' +
+                                        '<td class="masuk"></td>' +
+                                        '<td class="keluar"></td>' +
+                                        '<td class="wkthadir"></td>' +
+                                        '<td class="wktlembur"></td>' +
+                                        '<td class="jmlwaktu"></td>' +
+                                        '<td class="ket"></td>' +
+                                    '</tr>';
+                        $('.data-periode:last').after(newtr);
+                    } else {
+                        $('#hadirtotal').html(item.jmlwaktutotal);
+                        $('#lemburtotal').html(item.jmlwaktutotal);
+                        $('#hadirtotaldec').html(item.jmlwaktudec);
+                        $('#lemburtotaldec').html(item.jmlwaktudec);
+                        $('#periode-selesai').html(item.tanggal);
+                        $('#xuanglembur').html(item.jmlwaktudec);
+                        $('#xuangmakan').html(item.jmlmakan);
+                        $('#xuangtransport').html(item.jmltransport);
+                        if (item.jenispegawai == 16){
+                            $('#yuanglembur').html('13,000');
+                            $('#yuangmakan').html('25,000');
+                        } else {
+                            $('#yuanglembur').html('17,000');
+                            $('#yuangmakan').html('27,000');
+                        }
+                        $('#yuangtransport').html('38,000');
+                        $('#zuanglembur').html(numberWithCommas(item.jmluanglembur));
+                        $('#zuangmakan').html(numberWithCommas(item.jmluangmakan));
+                        $('#zuangtransport').html(numberWithCommas(item.jmluangtransport));
+                        var totaluang = item.jmluanglembur + item.jmluangmakan + item.jmluangtransport;
+                        $('#totaluang').html(numberWithCommas(totaluang));
+                    }
+                });
+            },
+            error: function () {
+                alert("Data tidak berhasil diload, silahkan coba lagi");
+                //location.reload();
+            }
+        });
+    });
+
+    // comma 1000 separator
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+    .ui-autocomplete-input {
+      border: none;
+      font-size: 14px;
+      width: 300px;
+      height: 24px;
+      margin-bottom: 5px;
+      padding-top: 2px;
+      border: 1px solid #DDD !important;
+      padding-top: 0px !important;
+      z-index: 1511;
+      position: relative;
+    }
+    .ui-menu .ui-menu-item a {
+      font-size: small;
+    }
+    .ui-autocomplete {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1510 !important;
+      float: left;
+      display: none;
+      min-width: 160px;
+      width: 160px;
+      padding: 4px 0;
+      margin: 2px 0 0 0;
+      list-style: none;
+      background-color: #ffffff;
+      border-color: #ccc;
+      border-color: rgba(0, 0, 0, 0.2);
+      border-style: solid;
+      border-width: 1px;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
+      *border-right-width: 2px;
+      *border-bottom-width: 2px;
+    }
+    .ui-menu-item > a.ui-corner-all {
+        display: block;
+        padding: 3px 15px;
+        clear: both;
+        font-weight: normal;
+        line-height: 18px;
+        color: #555555;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .ui-state-hover, .ui-state-active {
+          color: #ffffff;
+          text-decoration: none;
+          background-color: #0088cc;
+          border-radius: 0px;
+          -webkit-border-radius: 0px;
+          -moz-border-radius: 0px;
+          background-image: none;
+    }
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+</style>
+
+{% endblock %}

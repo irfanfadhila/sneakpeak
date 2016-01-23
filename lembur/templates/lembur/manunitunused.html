@@ -1,0 +1,820 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <ul class="tabs" data-tab role="tablist">
+          <li class="tab-title" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-1" style="padding: 10px; border-right: 1px solid black; font-size: small;">Pengajuan Lembur</a></li>
+          <li class="tab-title active" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-2" style="padding: 10px ;border-right: 1px solid black; font-size: small;">Data Lembur {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }}</a></li>
+          <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3" style="padding: 10px; font-size: small;">Laporan Lembur {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }}</a></li>
+        </ul>
+        <div class="tabs-content">
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-1">
+            <p>
+                  <b style="color: #FF8000; font-size: medium">{{ plcount.0 }}</b> | <a class="button radius tiny">Pengajuan Baru</a>&#8212;
+                  <b style="color: #FF8000; font-size: medium">{{ plcount.1 }}</b> | <a class="button radius tiny">Persetujuan Manajer/Wadek</a>&#8212;
+                  <b style="color: #FF8000; font-size: medium">{{ plcount.2 }}</b> | <a class="button radius tiny">Verifikasi SDM</a>&#8212;
+                  <b style="color: #FF8000; font-size: medium">{{ plcount.3 }}</b> | <a class="button radius tiny">Penyerahan Dokumen Pendukung</a>&#8212;
+                  <b style="color: #FF8000; font-size: medium">{{ plcount.4 }}</b> | <a class="button radius tiny">Proses Pembayaran</a>
+            </p>
+              <h6><b>Daftar Pengajuan Lembur oleh Saya</b></h6>
+              <p style="font-size: small">Berikut ini adalah daftar semua pengajuan lembur yang saya ajukan:</p>
+              <a href="#" data-reveal-id="add-pengajuan" class="button round tiny"><i class="fi-page-add" style="font-size:12px;"></i> Pengajuan Baru</a>
+              {% if pengajuanlembur %}
+              <table id="table-id-pengajuan" class="display table-data" style="table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th style="width:5%;">ID</th>
+                        <th style="width: 30%">Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tfoot style="display: table-header-group;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for lembur in pengajuanlembur %}
+                        <tr id="{{ forloop.counter }}">
+                            <td id="id-lembur-{{ lembur.id }}">{{ lembur.id }}</td>
+                            <td><a class="view-row" href="#" data-reveal-id="detail-pengajuan" data-id-lembur="{{ lembur.id }}">{{ lembur.judul_lembur }}</a></td>
+                            <td>
+                                {% for waktu in wktlembur %}
+                                    {% if waktu.id == lembur.id %}
+                                        {% for result in waktu.result %}
+                                            {{ result.0|date:'d M Y' }} <br> {{ result.1|time:'H:i' }} - {{ result.2|time:'H:i' }} <br>
+                                            -------------------- <br>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ lembur.tgl_pengajuan|date:'d M Y' }}</td>
+                            <td>{{ lembur.id_status.nama_status }}</td>
+                            <td>
+                                <span data-tooltip aria-haspopup="true" class="has-tip" title="Ubah">
+                                    <a class="edit-row" data-reveal-id="edit-lembur" data-id-lembur="{{ lembur.id }}"><i class="fi-page-edit size-24"></i></a>
+                                </span> |
+                                <span data-tooltip aria-haspopup="true" class="has-tip" title="Hapus">
+                                    <a class="delete-row" data-reveal-id="delete-lembur" data-id-lembur="{{ lembur.id }}"><i class="fi-trash size-24"></i></a>
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>Anda tidak pernah mengajukan lembur</p>
+                {% endif %}
+          </section>
+          <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-2">
+            <p>
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Pengajuan Baru</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Persetujuan Manajer/Wadek</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Verifikasi SDM</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Penyerahan Dokumen Pendukung</a>&#8212;
+                  <a class="button radius tiny"><b style="color: yellow; font-size: medium">1</b> | Proses Pembayaran</a>
+            </p>
+              <h6><b>Daftar Pengajuan Lembur di Unit Kerja {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }}</b></h6>
+            <p style="font-size: small;">Berikut ini adalah data semua pegawai lembur di Unit Kerja {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }}:</p>
+              <table id="table-id-ditugasi" class="display table-data" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th style="width:5%;">ID</th>
+                        <th style="width: 30%">Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tfoot style="display: table-header-group;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Waktu Lembur</th>
+                        <th>Tanggal Pengajuan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr id="1">
+                            <td>1</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Pengaturan Listrik Compfest</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>28 September 2015</td>
+                            <td>Persetujuan Manajer/Wadek</td>
+                            <td>-</td>
+                        </tr>
+                        <tr id="2">
+                            <td>2</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Piket Mingguan</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>28 September 2015</td>
+                            <td>Persetujuan Manajer/Wadek</td>
+                            <td>[<a>Setujui</a>] [<a>Tolak</a>]</td>
+                        </tr>
+                        <tr id="3">
+                            <td>3</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Seminar</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>23 September 2015</td>
+                            <td>Verifikasi SDM</td>
+                            <td>-</td>
+                        </tr>
+                        <tr id="4">
+                            <td>4</td>
+                            <td><a href="#" data-reveal-id="detail-pengajuan">Staf IT untuk Persiapan Awal Semester</a></td>
+                            <td>01 - 02 Oktober 2015</td>
+                            <td>1 September 2015</td>
+                            <td>Proses Pembayaran</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+          </section>
+          <section role="tabpanel" aria-hidden="true" class="content" id="panel2-3">
+            <h6><b>Laporan Lembur {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }}</b></h6>
+            <p style="font-size: small;">Berikut ini adalah visualisasi laporan lembur pegawai di Unit Kerja {{ pegawai.id_jabatan.id_unit_kerja.nama_unit }} untuk periode:</p>
+            <p style="font-size: small;">1 Agustus 2015 - 31 Agustus 2015  <a>[Ubah Periode]</a></p>
+            <p style="font-size: small;"><a>_Unduh laporan lembur dalam format berkas Excel_</a></p>
+            <div id="manunit-chart"></div>
+            <p>Gambaran Umum Lembur untuk Tendik: [Nama Pegawai]</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hari, Tanggal</th>
+                        <th>Judul</th>
+                        <th>Jumlah jam lembur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Senin, 28 September 2015</td>
+                        <td><a href="#" data-reveal-id="detail-pengajuan">Support IT untuk kegiatan Compfest</a></td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr>
+                        <td>Selasa, 29 September 2015</td>
+                        <td><a href="#" data-reveal-id="detail-pengajuan">Support IT untuk kegiatan instalasi listrik</a></td>
+                        <td>3 jam</td>
+                    </tr>
+                    <tr>
+                        <td>Rabu, 30 September 2015</td>
+                        <td><a href="#" data-reveal-id="detail-pengajuan">Support IT untuk kegiatan persiapan kelas</a></td>
+                        <td>3 jam</td>
+                    </tr>
+                </tbody>
+            </table>
+          </section>
+        </div>
+
+    </div>
+
+</div>
+
+    <!--Pop Up Pengajuan Baru-->
+    <div id="add-pengajuan" class="reveal-modal " data-reveal>
+            <form id="form-pengajuan">
+              {% csrf_token %}
+              <fieldset>
+              <legend>Formulir Pengajuan Lembur</legend>
+              <p><i>Lengkapi formulir pengajuan di bawah ini. Semua field wajib diisi.</i></p>
+              <table style="width: 100%;" id="table-pengajuan">
+                  <tr>
+                      <td>Judul</td>
+                      <td>
+                          <input name="judul" type="text" required placeholder="Tulis judul lembur" style="font-size: small">
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Pemberi Tugas</td>
+                      <td>
+                          <input class="pegawai-input" type="text" required placeholder="Tulis pemberi tugas" style="font-size: small">
+                          <input class="pegawai-input-hidden" type="hidden" name="pemberi-tugas">
+                      </td>
+                  </tr>
+                  <tr class="tanggal">
+                      <td class="tgl-label" style="width: 20%">Tanggal/Waktu Lembur</td>
+                      <td>
+                          <input name="tanggal" type="date" required style="font-size:small;width: 25%; display: inline;">
+                          <input name="wkt-mulai" type="time" required style="font-size:small;width: 17%; display: inline;"> -
+                          <input name="wkt-selesai" type="time" required style="font-size:small;width: 17%; display:inline;">&nbsp;
+                          <input name="hari-kerja" value="false1" type="checkbox" style="display:inline;">&nbsp;akhir pekan / hari libur&nbsp;
+                          <div class="add-holder1" style="display:inline;">
+                              <a id="tambah-tgl" class="button round tiny" style="display: inline;"><i class="fi-plus"></i></a>
+                          </div>
+                          <div class="rm-holder1" style="display: inline;"></div>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Tempat</td>
+                      <td>
+                          <input name="tempat" type="text" placeholder="Tulis tempat lembur" style="font-size: small">
+                      </td>
+                  </tr>
+                  <tr class="pegawai">
+                      <td class="pegawai-label">Pegawai Lembur</td>
+                      <td>
+                          <input class="pegawai-input" type="text" required placeholder="Cari nama pegawai" style="font-size:small;width:70%; display:inline;">
+                          <input class="pegawai-input-hidden" type="hidden" name="pegawai-lembur">
+                          <div class="add-holder2" style="display:inline;">
+                              <a id="tambah-pegawai" class="button round tiny" style="display:inline;"><i class="fi-plus"></i></a>
+                          </div><div class="rm-holder2" style="display: inline;"></div>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Lembur untuk Kegiatan</td>
+                      <td>
+                          <input type="radio" name="jenis" value="1" style="display:inline;"> Akademik
+                          <input type="radio" name="jenis" value="2" style="display:inline;"> Non Akademik
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Keterangan</td>
+                      <td>
+                          <textarea name="keterangan" style="font-size: small" placeholder="Tulis deskripsi beban kerja dan jenis pekerjaan" rows="5" cols="1"></textarea>
+                      </td>
+                  </tr>
+              </table>
+              <input type="checkbox" required> Saya menyetujui bahwa data yang dimasukkan sudah benar adanya sesuai dengan penugasan lembur yang diberikan oleh Pimpinan.
+              </fieldset>
+              <button id="add-lembur-btn" class="button radius tiny" type="submit">Ajukan Lembur</button>
+              <button class="custom-close-modal button radius tiny" type="button">Batal</button>
+            </form>
+            <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+            <div id="flash"></div>
+        </div>
+
+    <!--Pop Up Detail Pengajuan-->
+    <div id="detail-pengajuan" class="reveal-modal " data-reveal>
+        <fieldset style="font-size: small">
+            <legend style="font-size: medium">Data Pengajuan Lembur</legend>
+            <a class="ubah button round tiny" style="float: right;">Ubah Data Lembur</a>
+            <table class="table-ubah" style="width: 100%">
+                <tr>
+                    <td>Judul</td>
+                    <td><input id="view-judul" disabled placeholder="Tulis judul lembur" type="text" style="font-size: small"></td>
+                </tr>
+                <tr>
+                    <td>Pemberi Tugas</td>
+                    <td>
+                        <input id="view-pemberitugas" type="text" disabled placeholder="Tulis judul lembur" style="font-size: small">
+                    </td>
+                </tr>
+                <tr class="view-row-tgl">
+                    <td style="width: 30%">Tanggal/Waktu Lembur</td>
+                    <td><input class="view-tgl" disabled type="date" style="font-size: small; width: 25%; display: inline;">
+                        <input class="view-wktmulai" disabled type="time" style="width: 20%; display: inline;"> -
+                        <input class="view-wktselesai" disabled type="time" style="width: 20%; display:inline;">
+                        <input class="view-harikerja" disabled type="checkbox" style="display:inline;">&nbsp;akhir pekan / hari libur&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>Tempat</td>
+                    <td><input id="view-tempat" disabled placeholder="Fakultas Ilmu Komputer UI" type="datetime" style="font-size: small"></td>
+                </tr>
+                <tr class="view-row-pegawai">
+                    <td>Pegawai Lembur</td>
+                    <td><input class="view-pegawai" disabled placeholder="Cari nama pegawai" type="text" style="font-size:small;width:70%; display:inline;"> </td>
+                </tr>
+                <tr>
+                    <td>Lembur untuk Kegiatan</td>
+                    <td>
+                        <input id="view-akademik" disabled type="radio" name="jenis" value="1" style="display:inline;"> Akademik
+                        <input id="view-nonakademik" disabled type="radio" name="jenis" value="2" style="display:inline;"> Non Akademik
+                    </td>
+                </tr>
+                <tr>
+                    <td>Keterangan</td>
+                    <td><textarea id="view-keterangan" style="font-size: small" disabled placeholder="Tulis deskripsi beban kerja dan jenis pekerjaan" rows="5" cols="1"></textarea></td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td><input id="view-status" disabled placeholder="Nama status" type="text" style="font-size:small;width:70%; display:inline;"> </td>
+                </tr>
+            </table>
+            <p style="font-size: small;"><i>diperbarui tanggal 28 Sept 2015 pkl 13.00 [<a>lihat detail</a>]</i></p>
+            <a class="button round tiny" style="float: right;">Setujui Pengajuan Lembur</a>
+            <a class="button round tiny" data-reveal-id="penolakan" style="float: left;">Tolak Pengajuan Lembur</a>
+            <br><br>
+            <ul class="accordion" data-accordion>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel2a">Daftar Hadir dan Rekapitulasi Honor Lembur</a>
+                <div id="panel2a" class="content active">
+                  <table>
+                      <caption>Daftar Hadir dan Rekapitulasi Honor Lembur</caption>
+                      <thead>
+                        <tr>
+                            <th style="width: 2%;">No</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Nama Pegawai</th>
+                            <th>Waktu Masuk</th>
+                            <th>Waktu Pulang</th>
+                            <th>Honor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>XYZ</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>ABC</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>DEF</td>
+                            <td>17.00 jam</td>
+                            <td>23.00</td>
+                            <td>(belum dihitung)</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel1a">Dokumen Pendukung</a>
+                <div id="panel1a" class="content">
+                  <table style="width:75%;">
+                      <caption>Dokumen pendukung lembur di hari kerja biasa</caption>
+                      <tr>
+                          <td style="width: 25%;">Form Tugas Lembur</td>
+                          <td>FormLembur_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                  </table>
+                  <table style="width:75%;">
+                      <caption>Dokumen pendukung lembur di akhir pekan / hari libur</caption>
+                      <tr>
+                          <td style="width: 25%;">SPKL</td>
+                          <td>SPKL_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                      <tr>
+                          <td>Surat Tugas</td>
+                          <td>SuratTugas_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                      <tr>
+                          <td>Daftar Hadir</td>
+                          <td>DaftarHadir_Judul.pdf</td>
+                          <td><a class="button round tiny">Lihat</a></td>
+                      </tr>
+                  </table>
+                </div>
+              </li>
+              <li class="accordion-navigation">
+                <a style="font-size: small" href="#panel3a">Riwayat Pengajuan Lembur</a>
+                <div id="panel3a" class="content">
+                  <table>
+                      <caption>Riwayat Pengajuan Lembur</caption>
+                      <thead>
+                        <tr>
+                            <th style="width: 2%;">No</th>
+                            <th>Hari, Tanggal</th>
+                            <th>Waktu</th>
+                            <th>Status Pengajuan</th>
+                            <th>Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Senin, 28 Sept 2015</td>
+                            <td>10.00 AM</td>
+                            <td>Pengajuan Baru</td>
+                            <td>Belum disetujui manajer</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Selasa, 29 Sept 2015</td>
+                            <td>12.00 PM</td>
+                            <td>Pengajuan Baru</td>
+                            <td>Disetujui manajer</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Senin, 29 Sept 2015</td>
+                            <td>12.00 PM</td>
+                            <td>Kelengkapan Dokumen Pendukung</td>
+                            <td>Dokumen belum diunggah</td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </li>
+            </ul>
+        </fieldset>
+        <a class="close-reveal-modal" style="font-size: large">&#215;</a>
+    </div>
+
+    <!--Pop Up Penolakan-->
+    <div id="penolakan" class="reveal-modal small" data-reveal>
+        <p>Silahkan mengisi alasan penolakan:</p>
+        <textarea rows="3" cols="1"></textarea>
+        <p>Apakah anda yakin ingin menolak pengajuan ini?</p>
+        <button class="custom-close-modal button round tiny">Ya</button>
+        <button class="custom-close-modal button round tiny">Tidak</button>
+    </div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation({
+        reveal: {
+            multiple_opened: true
+        }
+    });
+    $(document).ready(function () {
+        $('.table-data tfoot th').each( function () {
+            var title = $('.table-data thead th').eq( $(this).index() ).text();
+            $(this).html( '<input style="height:30px;" type="text" placeholder="Search '+title+'" />' );
+            if (title == "ID"){
+                $(this).html('');
+            }
+        } );
+
+        // DataTable
+        var tablePengajuan = $('#table-id-pengajuan').DataTable({"bAutoWidth": false, "order": [[0, "desc"]]});
+        var tableDitugasi = $('#table-id-ditugasi').DataTable({"bAutoWidth": false});
+
+        // Apply the search
+        tablePengajuan.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+        tableDitugasi.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+
+        $('p').on('click', 'a', function(){
+            tablePengajuan.columns(4).search($(this).text()).draw();
+        });
+        $('p').on('click', 'a', function(){
+            tableDitugasi.columns(4).search($(this).text()).draw();
+        });
+        $('#tabmenu').on('click', 'a',function(){
+            tablePengajuan.search('').columns().search('').draw();
+        });
+        $('#tabmenu').on('click', 'a',function(){
+            tableDitugasi.search('').columns().search('').draw();
+        });
+
+        // charts visualisasi laporan pegawai untuk manajer unit
+        $('#manunit-chart').highcharts({
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Grafik Visualisasi Lembur Pegawai di Unit Kerja [Nama Unit Kerja]',
+                style: {
+                    fontSize: 'small'
+                }
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Pegawai A', 'Pegawai B', 'Pegawai C', 'Pegawai D']
+            },
+            yAxis: {
+                title: {
+                    text: 'Jam Kerja'
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                    enableMouseTracking: false
+                }
+            },
+            series: [{
+                name: 'Total Jam Lembur',
+                data: [10, 20, 10, 40]
+            },]
+        });
+    });
+    $('.custom-close-modal').click(function(){
+        $(this).closest('.reveal-modal').foundation('reveal', 'close');
+    });
+     // add new tanggal row in form-pengajuan
+      $(document).on("click", "#tambah-tgl",function()
+      {
+        var counttr = $('.tanggal').length + 1;
+        var newtr = $("<tr class='tanggal'>" +
+                      "<td class='tgl-label' style='width: 20%'>Tanggal/Waktu Lembur</td>" +
+                      "<td> <input name='tanggal' type='date' required style='font-size:small;width: 25%; display: inline;'> " +
+                        "<input name='wkt-mulai' type='time' required style='font-size:small;width: 17%; display: inline;'> - " +
+                        "<input name='wkt-selesai' type='time' required style='font-size:small;width: 17%; display:inline;'>&nbsp; " +
+                        "<input name='hari-kerja' value='false"+ counttr +"' type='checkbox' style='display:inline;'>&nbsp;akhir pekan / hari libur&nbsp; " +
+                        "<div class='add-holder1' style='display:inline;'>" +
+                        "<a id='tambah-tgl' class='button round tiny' style='display: inline;'><i class='fi-plus'></i></a> </div>" +
+                        "<div class='rm-holder1' style='display: inline;'></div> </td> </tr> <tr>");
+        $(this).remove();
+        $("#table-pengajuan").find(".tanggal:last").after(newtr);
+        $(".tgl-label:last").html("");
+        $(".rm-holder1:last").html("<a class='remove1 button round tiny' style='background-color:red;'><i class='fi-minus'></i></a>");
+        return false;
+      });
+    // add new pegawai row in form-pengajuan
+      $(document).on("click", "#tambah-pegawai",function()
+      {
+        var newtr = $("<tr class='pegawai'>" +
+                "<td class='pegawai-label'>Pegawai Lembur</td>" +
+                "<td> <input class='pegawai-input' type='text' required placeholder='Cari nama pegawai' style='font-size:small;width:70%; display:inline;'>" +
+                "<input class='pegawai-input-hidden' type='hidden' name='pegawai-lembur'> " +
+                "<div class='add-holder2' style='display:inline;'>" +
+                "<a id='tambah-pegawai' class='button round tiny' style='display:inline;'><i class='fi-plus'></i></a> " +
+                "</div><div class='rm-holder2' style='display: inline;'></div> </td> </tr> <tr>");
+        $(this).remove();
+        $("#table-pengajuan").find(".pegawai:last").after(newtr);
+        $(".pegawai-label:last").html("");
+        $(".rm-holder2:last").html("<a class='remove2 button round tiny' style='background-color:red;'><i class='fi-minus'></i></a>");
+        return false;
+      });
+    // remove clicked tanggal row
+      $(document).on("click", ".remove1",function(){
+          $add = $(this).closest("tr").find("#tambah-tgl");
+          $(this).closest("tr").remove();
+          if($(".remove1").length == 0 || $add){
+            $(".add-holder1:last").html("<a id='tambah-tgl' class='button round tiny' style='display: inline;'><i class='fi-plus'></i></a>");
+          }
+      });
+    // remove clicked pegawai row
+      $(document).on("click", ".remove2",function(){
+          $add = $(this).closest("tr").find("#tambah-pegawai");
+          $(this).closest("tr").remove();
+          if($(".remove2").length == 0 || $add){
+            $(".add-holder2:last").html("<a id='tambah-pegawai' class='button round tiny' style='display: inline;'><i class='fi-plus'></i></a>");
+          }
+      });
+    // handle submit form pengajuan
+      $(document).on("submit", "#form-pengajuan", function(e){
+          e.preventDefault();
+          form = $('#form-pengajuan').serializeArray();
+          $("#flash").show();
+          $("#flash").fadeIn(400).html('<p>Pengajuan baru sedang diproses ...</p>');
+          $.ajax({
+              type: "POST",
+              url: "../../pengajuanbaru/",
+              data: form,
+              dataType: "json",
+              success: function (response) {
+                  $('#flash').hide();
+                  alert("Data berhasil disimpan");
+                  $('.reveal-modal').foundation('reveal', 'close');
+                  $('#add-pengajuan').html($('#add-pengajuan').data('initial-state'));
+                  $(document).foundation('reveal', 'reflow');
+                  var id = response.id;
+                  var judul = "<a href='#' data-reveal-id='detail-pengajuan' data-id-lembur=" + id + ">" + response.judul + "</a>";
+                  var wktlembur = "";
+                  $.each(response.wktlembur, function(i, item){
+                      tgl = $.datepicker.formatDate('d M yy', new Date(item[0]));
+                      start = item[1];
+                      end = item[2];
+                      wktlembur += tgl + "<br>" + start + " - " + end + "<br> -------------------- <br>";
+                  });
+                  var tglpengajuan = $.datepicker.formatDate('d M yy', new Date(response.tglpengajuan));
+                  var status = response.status;
+                  var aksi = "<span data-tooltip aria-haspopup='true' class='has-tip' title='Ubah'><a class='edit-row' data-reveal-id='edit-lembur' data-id-lembur=" + id + "><i class='fi-page-edit size-24'></i></a></span> | <span data-tooltip aria-haspopup='true' class='has-tip' title='Hapus'><a class='delete-row' data-reveal-id='delete-lembur' data-id-lembur=" + id + "><i class='fi-trash size-24'></i></a></span>";
+                  var adapegawai = response.adapegawai;
+                  $('#table-id-pengajuan').DataTable().row.add([id, judul, wktlembur, tglpengajuan, status, aksi]).draw();
+                  if (adapegawai){
+                      $('#table-id-ditugasi').DataTable().row.add([id, judul, tglpengajuan, wktlembur, status, aksi]).draw();
+                  }
+              },
+              error: function () {
+                  alert("Data tidak berhasil disimpan, silahkan coba lagi");
+                  location.reload();
+              }
+          });
+      });
+    // handle masukan autocomplete untuk input pegawai
+      $(document).on("focus", ".pegawai-input", function(e){
+          $(this).autocomplete({
+              source: "../../searchpegawai/",
+              change: function(e, ui){
+                  if (ui.item==null){
+                      $(this).val('');
+                  }
+              },
+              focus: function(e, ui){
+                  $(this).val(ui.item.label);
+                  return false;
+              },
+              select: function(e, ui){
+                  $(this).val(ui.item.label);
+                  $(this).closest("tr").find($(".pegawai-input-hidden")).val(ui.item.value);
+                  return false;
+              }
+          });
+      });
+    // initial state add pengajuan
+      $('#add-pengajuan').data('initial-state', $('#add-pengajuan').html());
+    // initial state detail pengajuan
+    $('#detail-pengajuan').data('initial-state', $('#detail-pengajuan').html());
+    // open modal for view lembur
+    $('tbody tr td').on('click', '.view-row', function(){
+        var targetModal = $('#' + $(this).data('revealId'));
+        var id = $(this).data('idLembur');
+        $.ajax({
+            type: "POST",
+            url: "../../detaillembur/",
+            data: {
+                row: id,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+            dataType: "json",
+            success: function(response){
+                $('#detail-pengajuan').html($('#detail-pengajuan').data('initial-state'));
+                $('#view-judul').val(response.judul);
+                $('#view-pemberitugas').val(response.pemberitugas);
+                $('#view-tempat').val(response.tempat);
+                $('#view-keterangan').val(response.keterangan);
+                $('#view-status').val(response.status);
+                if (response.jenis == 1){
+                    $('#view-akademik').prop("checked", true);
+                } else {
+                    $('#view-nonakademik').prop("checked", true);
+                }
+                $.each(response.tanggal, function(i, item){
+                    if (i == 0){
+                        $('.view-tgl').val(item[0]);
+                        $('.view-wktmulai').val(item[1]);
+                        $('.view-wktselesai').val(item[2]);
+                        $('.view-harikerja').prop("checked", !item[3]);
+                    } else {
+                        var newrow = $("<tr class='view-row-tgl'>" +
+                                "<td style='width: 30%'></td>" +
+                                "<td><input class='view-tgl' disabled type='date' style='font-size: small; width: 25%; display: inline;'> " +
+                                "<input class='view-wktmulai' disabled type='time' style='width: 20%; display: inline;'> - " +
+                                "<input class='view-wktselesai' disabled type='time' style='width: 20%; display:inline;'> " +
+                                "<input class='view-harikerja' disabled type='checkbox' style='display:inline;'>&nbsp;akhir pekan / hari libur&nbsp;" +
+                                "</td> </tr>");
+                        $(".view-row-tgl:last").after(newrow);
+                        $('.view-tgl:last').val(item[0]);
+                        $('.view-wktmulai:last').val(item[1]);
+                        $('.view-wktselesai:last').val(item[2]);
+                        $('.view-harikerja:last').prop("checked", !item[3]);
+                    }
+                });
+                $.each(response.pegawai, function(i, item){
+                    if (i == 0){
+                        $('.view-pegawai').val(item[0]);
+                    } else {
+                        var newrow = $("<tr class='view-row-pegawai'>" +
+                                "<td></td>" +
+                                "<td><input class='view-pegawai' disabled placeholder='Cari nama pegawai' type='text' style='font-size:small;width:70%; display:inline;'> </td>" +
+                                "</tr>");
+                        $(".view-row-pegawai:last").after(newrow);
+                        $(".view-pegawai:last").val(item[0]);
+                    }
+                });
+            },
+            error: function(){
+                alert("Data tidak berhasil di buka silahkan coba lagi");
+            }
+        });
+    });
+    $(document).on("click", ".ubah", function(){
+        $(this).closest("fieldset").find(".table-ubah input, .table-ubah textarea").prop("disabled", false);
+        $(this).text("Simpan Data Lembur");
+        $(this).attr("class", "simpan button round tiny");
+    });
+    $(document).on("click", ".simpan", function(){
+        $(this).closest("fieldset").find(".table-ubah input, .table-ubah textarea").prop("disabled", true);
+        $(this).text("Ubah Data Lembur");
+        $(this).attr("class", "ubah button round tiny")
+    });
+</script>
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    .ui-autocomplete-input {
+      border: none;
+      font-size: 14px;
+      width: 300px;
+      height: 24px;
+      margin-bottom: 5px;
+      padding-top: 2px;
+      border: 1px solid #DDD !important;
+      padding-top: 0px !important;
+      z-index: 1511;
+      position: relative;
+    }
+    .ui-menu .ui-menu-item a {
+      font-size: small;
+    }
+    .ui-autocomplete {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1510 !important;
+      float: left;
+      display: none;
+      min-width: 160px;
+      width: 160px;
+      padding: 4px 0;
+      margin: 2px 0 0 0;
+      list-style: none;
+      background-color: #ffffff;
+      border-color: #ccc;
+      border-color: rgba(0, 0, 0, 0.2);
+      border-style: solid;
+      border-width: 1px;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
+      *border-right-width: 2px;
+      *border-bottom-width: 2px;
+    }
+    .ui-menu-item > a.ui-corner-all {
+        display: block;
+        padding: 3px 15px;
+        clear: both;
+        font-weight: normal;
+        line-height: 18px;
+        color: #555555;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .ui-state-hover, .ui-state-active {
+          color: #ffffff;
+          text-decoration: none;
+          background-color: #0088cc;
+          border-radius: 0px;
+          -webkit-border-radius: 0px;
+          -moz-border-radius: 0px;
+          background-image: none;
+    }
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+</style>
+
+{% endblock %}

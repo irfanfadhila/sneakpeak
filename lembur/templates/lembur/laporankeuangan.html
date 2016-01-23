@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <h6>Silahkan pilih periode laporan keuangan:</h6>
+
+        <div style="display:block;overflow:auto;">
+            <form id="form-periode">
+                {% csrf_token %}
+                <div style="display:inline;float:left;">
+                    <label>Pilih laporan dari tanggal:</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <input type="date" name="periode_mulai">
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label> - </label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <input type="date" name="periode_selesai">
+                </div>
+                <div style="display:inline;float:left;">
+                    <label>&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div style="display:inline;float:left;">
+                    <button type="submit" class="button radius small">Cari!</button>
+                </div>
+            </form>
+        </div>
+        
+        <table id="laporan-periode" class="display table-data" style="table-layout:fixed; width:100%;">
+            <caption>
+                Laporan Lembur Pegawai Fasilkom UI <br>
+                <div id="periode-mulai" style="display: inline;"></div> &nbsp; s.d &nbsp;
+                <div id="periode-selesai" style="display:inline;"></div>
+            </caption>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Lembur</th>
+                    <th>Makan</th>
+                    <th>Transport</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>TOTAL</th>
+                    <th id="total-bantuan"></th>
+                    <th id="total-makan"></th>
+                    <th id="total-transport"></th>
+                    <th id="total-total"></th>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr class="data-periode">
+                    <td class="nama"></td>
+                    <td class="bantuan"></td>
+                    <td class="makan"></td>
+                    <td class="transport"></td>
+                    <td class="total"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="float:right; margin-top:5px;">
+            <form id="genreport" method="POST" action="{% url 'lembur:pdflaporanperiode' %}">
+                {% csrf_token %}
+                <input type="hidden" name="p_start" required>
+                <input type="hidden" name="p_end" required>
+                <a class="button radius small" type="submit" onclick="document.forms['genreport'].submit();">Generate Report</a>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).foundation();
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+
+    // initial state table laporan periode
+    $('#laporan-periode').data('initial-state', $('#laporan-periode').html());
+
+    // cari data per periode
+    $(document).on('submit', '#form-periode', function(e){
+        e.preventDefault();
+        var form = $('#form-periode').serializeArray();
+        $.ajax({
+            type: 'POST',
+            url: '../../cariperiode/',
+            data: form,
+            dataType: 'json',
+            success: function (response) {
+                $('#laporan-periode').html($('#laporan-periode').data('initial-state'));
+                var periodemulai = $.datepicker.formatDate('d MM yy', new Date(form[1].value));
+                var periodeselesai = $.datepicker.formatDate('d MM yy', new Date(form[2].value));
+                $('#periode-mulai').html(periodemulai);
+                $('#periode-selesai').html(periodeselesai);
+                $('#genreport input[name=p_start]').val(form[1].value);
+                $('#genreport input[name=p_end]').val(form[2].value);
+                var totalBantuan = 0;
+                var totalMakan = 0;
+                var totalTransport = 0;
+                var totalTotal = 0;
+                $.each(response, function(i, item){
+                    var counter = i;
+                    var total = parseInt(item.lembur) + parseInt(item.makan) + parseInt(item.transport);
+                    if (item.lembur != null && item.makan != null && item.transport != null) {
+                        totalBantuan += parseInt(item.lembur);
+                        totalMakan += parseInt(item.makan);
+                        totalTransport += parseInt(item.transport);
+                        totalTotal += total;
+                    }
+                    $('.data-periode:last .nama').html(numberWithCommas(item.nama));
+                    $('.data-periode:last .bantuan').html(numberWithCommas(item.lembur));
+                    $('.data-periode:last .makan').html(numberWithCommas(item.makan));
+                    $('.data-periode:last .transport').html(numberWithCommas(item.transport));
+                    $('.data-periode:last .total').html(numberWithCommas(total));
+                    if (counter < (response.length - 1)) {
+                        var newtr = '<tr class="data-periode">' +
+                                        '<td class="nama"></td>' +
+                                        '<td class="bantuan"></td>' +
+                                        '<td class="makan"></td>' +
+                                        '<td class="transport"></td>' +
+                                        '<td class="total"></td>' +
+                                    '</tr>';
+                        $('.data-periode:last').after(newtr);
+                    }
+                });
+                $('#laporan-periode #total-bantuan').html(numberWithCommas(totalBantuan));
+                $('#laporan-periode #total-makan').html(numberWithCommas(totalMakan));
+                $('#laporan-periode #total-transport').html(numberWithCommas(totalTransport));
+                $('#laporan-periode #total-total').html(numberWithCommas(totalTotal));
+            },
+            error: function () {
+                alert("Data tidak berhasil diload, silahkan coba lagi");
+                //location.reload();
+            }
+        });
+    });
+
+    // comma 1000 separator
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+</script>
+
+<style>
+    .dataTables_wrapper {
+        font-size: small;
+    }
+    .dataTables_length label {
+        font-size: small;
+    }
+    .dataTables_length select {
+        height: 30px;
+        font-size: smaller;
+    }
+    .dataTables_filter label {
+        font-size: small;
+    }
+    .dataTables_filter input {
+        height: 30px;
+    }
+    ul.pagination li, ul {
+        font-size: small;
+    }
+    table thead tr th, table tbody tr td, p, table caption, form, .accordion .accordion-navigation a {
+        font-size: small;
+    }
+    fieldset legend {
+        font-size: medium;
+    }
+    fieldset {
+        border: none;
+    }
+    .reveal-modal {
+        padding: 0px;
+    }
+</style>
+
+{% endblock %}

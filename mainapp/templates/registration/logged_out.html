@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+
+    <div class="large-12 columns">
+
+        <p class="welcome"> Selamat Datang di Sistem Informasi SDM</p>
+        <p>Silahkan masukkan password kembali</p>
+        <a class="radius button" href="{% url 'mainapp:django_cas_ng.views.login' %}">Login</a>
+
+    </div>
+
+</div>
+
+{% include "scriptRef.html" %}
+
+<script>
+    $(document).ready(function () {
+        $('#table-id').DataTable();
+    });
+    $(document).foundation();
+</script>
+
+{% endblock %}
